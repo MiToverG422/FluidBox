@@ -1,6 +1,6 @@
-# 原生通知气泡 Hook 说明
+﻿# 原生通知气泡 Hook 说明
 
-本文档记录 MiBox 当前测试版中“原生通知气泡”开关的实现方式、Hook 点和测试方法。
+本文档记录 FluidBox 当前测试版中“原生通知气泡”开关的实现方式、Hook 点和测试方法。
 
 ## 功能目标
 
@@ -30,11 +30,11 @@
 
 | 文件 | 作用 |
 |---|---|
-| `app/src/main/java/com/mi/mibox/lsp/FrameworkHooker.kt` | system_server/framework 侧通知气泡 Hook |
-| `app/src/main/java/com/mi/mibox/lsp/SettingsHooker.kt` | Settings 侧解除 OEM 跳转，并在系统设置注入 MiBox 开关页 |
-| `app/src/main/java/com/mi/mibox/lsp/LspConfig.kt` | 原生通知气泡开关的持久化、同步和 Xposed 端读取 |
-| `app/src/main/java/com/mi/mibox/MainActivity.kt` | App 内开关状态绑定 |
-| `app/src/main/java/com/mi/mibox/ui/md3e/Md3eUi.kt` | 功能页 UI 开关 |
+| `app/src/main/java/com/mi/fluidbox/lsp/FrameworkHooker.kt` | system_server/framework 侧通知气泡 Hook |
+| `app/src/main/java/com/mi/fluidbox/lsp/SettingsHooker.kt` | Settings 侧解除 OEM 跳转，并在系统设置注入 FluidBox 开关页 |
+| `app/src/main/java/com/mi/fluidbox/lsp/LspConfig.kt` | 原生通知气泡开关的持久化、同步和 Xposed 端读取 |
+| `app/src/main/java/com/mi/fluidbox/MainActivity.kt` | App 内开关状态绑定 |
+| `app/src/main/java/com/mi/fluidbox/ui/md3e/Md3eUi.kt` | 功能页 UI 开关 |
 
 ## 开关同步位置
 
@@ -77,7 +77,7 @@ Xposed 端读取顺序大致为：
    - Android/System Framework
    - `com.android.systemui`
    - `com.android.settings`
-3. 在 MiBox 功能页开启“原生通知气泡”。
+3. 在 FluidBox 功能页开启“原生通知气泡”。
 4. 重启手机。
 5. 用 Telegram/NagramX 等真实会话通知测试。
 6. 查看通知记录：
@@ -129,6 +129,6 @@ adb shell dumpsys notification --noredact | findstr /i "fork.risin42.nagramx mAl
 查看 LSPosed 日志关键词：
 
 ```text
-MiBox-LSP
+FluidBox-LSP
 Framework native notification bubbles hooks installed
 ```

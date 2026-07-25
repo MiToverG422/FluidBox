@@ -1,0 +1,478 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: "Build channel"
+        required: true
+        default: "ci"
+        type: choice
+        options:
+          - ci
+          - prerelease
+          - release
+      version_name:
+        description: "Optional version name override"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: telegram_bot
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Resolve channel and version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          RUN_NUMBER="${GITHUB_RUN_NUMBER}"
+          DEFAULT_BASE_VERSION="0.0.1"
+
+          # Generate an 8-char CI code from [0-9a-z] with no repeated characters.
+          generate_ci_code() {
+            local chars=(0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z)
+            local code=""
+            while [[ ${#code} -lt 8 ]]; do
+              local idx=$((RANDOM % ${#chars[@]}))
+              local pick="${chars[$idx]}"
+              if [[ "${code}" == *"${pick}"* ]]; then
+                continue
+              fi
+              code+="${pick}"
+            done
+
+            local uniq_count
+            uniq_count="$(printf '%s' "${code}" | fold -w1 | sort -u | wc -l | tr -d ' ')"
+            if [[ "${uniq_count}" != "8" ]]; then
+              return 1
+            fi
+
+            printf '%s' "${code}"
+          }
+
+          CI_CODE=""
+          for _ in {1..5}; do
+            if CI_CODE="$(generate_ci_code)"; then
+              break
+            fi
+          done
+          if [[ -z "${CI_CODE}" ]]; then
+            echo "Failed to generate a valid 8-char CI code"
+            exit 1
+          fi
+
+          CI_VERSION_NAME="${DEFAULT_BASE_VERSION}-CI-${CI_CODE}"
+
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            CHANNEL="${{ github.event.inputs.channel }}"
+            INPUT_VERSION="${{ github.event.inputs.version_name }}"
+
+            if [[ -z "${CHANNEL}" ]]; then
+              CHANNEL="ci"
+            fi
+
+            case "${CHANNEL}" in
+              ci)
+                VERSION_NAME="${INPUT_VERSION:-${CI_VERSION_NAME}}"
+                IS_PRERELEASE=true
+                BUILD_VARIANT="release"
+                RELEASE_TAG="ci-latest"
+                RELEASE_NAME="FluidBox CI Latest ${VERSION_NAME}"
+                ;;
+              prerelease)
+                VERSION_NAME="${INPUT_VERSION:-${DEFAULT_BASE_VERSION}-rc.${RUN_NUMBER}}"
+                IS_PRERELEASE=true
+                BUILD_VARIANT="release"
+                RELEASE_TAG="manual-prerelease-${RUN_NUMBER}"
+                RELEASE_NAME="FluidBox ${VERSION_NAME}"
+                ;;
+              release)
+                VERSION_NAME="${INPUT_VERSION:-${DEFAULT_BASE_VERSION}}"
+                IS_PRERELEASE=false
+                BUILD_VARIANT="release"
+                RELEASE_TAG="manual-release-${RUN_NUMBER}"
+                RELEASE_NAME="FluidBox ${VERSION_NAME}"
+                ;;
+              *)
+                echo "Unsupported manual channel: ${CHANNEL}"
+                exit 1
+                ;;
+            esac
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+
+            if [[ "${TAG}" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)-rc([0-9]+)$ ]]; then
+              CHANNEL="prerelease"
+              VERSION_NAME="${BASH_REMATCH[1]}-rc${BASH_REMATCH[2]}"
+              IS_PRERELEASE=true
+              BUILD_VARIANT="release"
+              RELEASE_TAG="${TAG}"
+              RELEASE_NAME="FluidBox ${VERSION_NAME}"
+            elif [[ "${TAG}" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+              CHANNEL="release"
+              VERSION_NAME="${BASH_REMATCH[1]}"
+              IS_PRERELEASE=false
+              BUILD_VARIANT="release"
+              RELEASE_TAG="${TAG}"
+              RELEASE_NAME="FluidBox ${VERSION_NAME}"
+            else
+              echo "Unsupported tag format: ${TAG}"
+              echo "Use vX.Y.Z or vX.Y.Z-rcN"
+              exit 1
+            fi
+          else
+            CHANNEL="ci"
+            VERSION_NAME="${CI_VERSION_NAME}"
+            IS_PRERELEASE=true
+            BUILD_VARIANT="release"
+            RELEASE_TAG="ci-latest"
+            RELEASE_NAME="FluidBox CI Latest ${VERSION_NAME}"
+          fi
+
+          # Monotonic versionCode: start from 1 and increase by 1 every workflow run.
+          VERSION_CODE="${RUN_NUMBER}"
+          if [[ "${BUILD_VARIANT}" == "both" ]]; then
+            APK_PATH_GLOB="app/build/outputs/apk/debug/*.apk,app/build/outputs/apk/release/*.apk"
+          elif [[ "${BUILD_VARIANT}" == "debug" ]]; then
+            APK_PATH_GLOB="app/build/outputs/apk/debug/*.apk"
+          else
+            APK_PATH_GLOB="app/build/outputs/apk/release/*.apk"
+          fi
+
+          echo "channel=${CHANNEL}" >> "${GITHUB_OUTPUT}"
+          echo "version_name=${VERSION_NAME}" >> "${GITHUB_OUTPUT}"
+          echo "version_code=${VERSION_CODE}" >> "${GITHUB_OUTPUT}"
+          echo "ci_code=${CI_CODE}" >> "${GITHUB_OUTPUT}"
+          echo "is_prerelease=${IS_PRERELEASE}" >> "${GITHUB_OUTPUT}"
+          echo "build_variant=${BUILD_VARIANT}" >> "${GITHUB_OUTPUT}"
+          echo "release_tag=${RELEASE_TAG}" >> "${GITHUB_OUTPUT}"
+          echo "release_name=${RELEASE_NAME}" >> "${GITHUB_OUTPUT}"
+          echo "apk_path_glob=${APK_PATH_GLOB}" >> "${GITHUB_OUTPUT}"
+
+          echo "Resolved channel=${CHANNEL}"
+          echo "Resolved version_name=${VERSION_NAME}"
+          echo "Resolved version_code=${VERSION_CODE}"
+          echo "Resolved ci_code=${CI_CODE}"
+          echo "Resolved build_variant=${BUILD_VARIANT}"
+          echo "Resolved release_tag=${RELEASE_TAG}"
+          echo "Resolved release_name=${RELEASE_NAME}"
+          echo "Resolved apk_path_glob=${APK_PATH_GLOB}"
+
+      - name: Prepare signing config
+        id: signing
+        shell: bash
+        env:
+          FLUIDBOX_RELEASE_KEYSTORE_B64: ${{ secrets.FLUIDBOX_RELEASE_KEYSTORE_B64 }}
+          FLUIDBOX_RELEASE_STORE_PASSWORD: ${{ secrets.FLUIDBOX_RELEASE_STORE_PASSWORD }}
+          FLUIDBOX_RELEASE_KEY_ALIAS: ${{ secrets.FLUIDBOX_RELEASE_KEY_ALIAS }}
+          FLUIDBOX_RELEASE_KEY_PASSWORD: ${{ secrets.FLUIDBOX_RELEASE_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          HAS_RELEASE_SIGNING=false
+          KEYSTORE_PATH=""
+
+          if [[ -n "${FLUIDBOX_RELEASE_KEYSTORE_B64}" && -n "${FLUIDBOX_RELEASE_STORE_PASSWORD}" && -n "${FLUIDBOX_RELEASE_KEY_ALIAS}" && -n "${FLUIDBOX_RELEASE_KEY_PASSWORD}" ]]; then
+            mkdir -p .ci-signing
+            KEYSTORE_PATH="${GITHUB_WORKSPACE}/.ci-signing/release.jks"
+            printf '%s' "${FLUIDBOX_RELEASE_KEYSTORE_B64}" | base64 -d > "${KEYSTORE_PATH}"
+            HAS_RELEASE_SIGNING=true
+            echo "Release signing keystore prepared"
+          else
+            echo "::error::Release signing secrets are incomplete. CI/prerelease/release must use one unified signing certificate."
+            exit 1
+          fi
+
+          echo "has_release_signing=${HAS_RELEASE_SIGNING}" >> "${GITHUB_OUTPUT}"
+          echo "keystore_path=${KEYSTORE_PATH}" >> "${GITHUB_OUTPUT}"
+
+      - name: Build APK
+        env:
+          FLUIDBOX_RELEASE_STORE_PASSWORD: ${{ secrets.FLUIDBOX_RELEASE_STORE_PASSWORD }}
+          FLUIDBOX_RELEASE_KEY_ALIAS: ${{ secrets.FLUIDBOX_RELEASE_KEY_ALIAS }}
+          FLUIDBOX_RELEASE_KEY_PASSWORD: ${{ secrets.FLUIDBOX_RELEASE_KEY_PASSWORD }}
+        run: |
+          if [ "${{ steps.version.outputs.build_variant }}" = "both" ]; then
+            TASKS=(":app:assembleDebug" ":app:assembleRelease")
+          elif [ "${{ steps.version.outputs.build_variant }}" = "debug" ]; then
+            TASKS=(":app:assembleDebug")
+          else
+            TASKS=(":app:assembleRelease")
+          fi
+
+          if [ "${{ steps.signing.outputs.has_release_signing }}" != "true" ]; then
+            echo "::error::Release signing is required for all channels."
+            exit 1
+          fi
+
+          SIGN_RELEASE_WITH_DEBUG=false
+
+          GRADLE_ARGS=(
+            "-PFLUIDBOX_VERSION_NAME=${{ steps.version.outputs.version_name }}"
+            "-PFLUIDBOX_VERSION_CODE=${{ steps.version.outputs.version_code }}"
+            "-PFLUIDBOX_CI_SIGN_RELEASE_WITH_DEBUG=${SIGN_RELEASE_WITH_DEBUG}"
+          )
+
+          if [ "${{ steps.signing.outputs.has_release_signing }}" = "true" ]; then
+            GRADLE_ARGS+=(
+              "-PFLUIDBOX_RELEASE_STORE_FILE=${{ steps.signing.outputs.keystore_path }}"
+              "-PFLUIDBOX_RELEASE_STORE_PASSWORD=${FLUIDBOX_RELEASE_STORE_PASSWORD}"
+              "-PFLUIDBOX_RELEASE_KEY_ALIAS=${FLUIDBOX_RELEASE_KEY_ALIAS}"
+              "-PFLUIDBOX_RELEASE_KEY_PASSWORD=${FLUIDBOX_RELEASE_KEY_PASSWORD}"
+            )
+          fi
+
+          ./gradlew "${TASKS[@]}" "${GRADLE_ARGS[@]}" --no-daemon
+
+      - name: Prepare APK files
+        id: apks
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+
+          VERSION_NAME="${{ steps.version.outputs.version_name }}"
+          SAFE_VERSION_NAME="$(echo "${VERSION_NAME}" | sed 's/[^A-Za-z0-9._()-]/_/g')"
+
+          if [[ "${{ steps.version.outputs.build_variant }}" == "both" ]]; then
+            DEBUG_APK="$(ls -1 app/build/outputs/apk/debug/*.apk | head -n 1)"
+            RELEASE_APK="$(ls -1 app/build/outputs/apk/release/*.apk | head -n 1)"
+            DEBUG_OUT="dist/oos-toolbox-${SAFE_VERSION_NAME}-debug.apk"
+            RELEASE_OUT="dist/oos-toolbox-${SAFE_VERSION_NAME}-release.apk"
+            cp "${DEBUG_APK}" "${DEBUG_OUT}"
+            cp "${RELEASE_APK}" "${RELEASE_OUT}"
+            {
+              echo "files<<EOF"
+              echo "${DEBUG_OUT}"
+              echo "${RELEASE_OUT}"
+              echo "EOF"
+            } >> "${GITHUB_OUTPUT}"
+          elif [[ "${{ steps.version.outputs.build_variant }}" == "debug" ]]; then
+            DEBUG_APK="$(ls -1 app/build/outputs/apk/debug/*.apk | head -n 1)"
+            DEBUG_OUT="dist/oos-toolbox-${SAFE_VERSION_NAME}-debug.apk"
+            cp "${DEBUG_APK}" "${DEBUG_OUT}"
+            echo "files=${DEBUG_OUT}" >> "${GITHUB_OUTPUT}"
+          else
+            RELEASE_APK="$(ls -1 app/build/outputs/apk/release/*.apk | head -n 1)"
+            RELEASE_OUT="dist/oos-toolbox-${SAFE_VERSION_NAME}-release.apk"
+            cp "${RELEASE_APK}" "${RELEASE_OUT}"
+            echo "files=${RELEASE_OUT}" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Upload APK Artifact (CI)
+        if: steps.version.outputs.channel == 'ci'
+        uses: actions/upload-artifact@v4
+        with:
+          name: oos-toolbox-${{ steps.version.outputs.version_name }}
+          path: dist/*.apk
+
+      - name: Notify build to Telegram
+        if: always()
+        continue-on-error: true
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          BUILD_STATUS: ${{ job.status }}
+          BUILD_CHANNEL: ${{ steps.version.outputs.channel }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import uuid
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          from pathlib import Path
+
+          token = os.environ["TG_BOT_TOKEN"]
+          chat_id = os.environ["TG_CHAT_ID"]
+          build_status = os.environ.get("BUILD_STATUS", "unknown").lower()
+          channel = os.environ.get("BUILD_CHANNEL", "ci").lower()
+          repo = os.environ.get("GITHUB_REPOSITORY", "")
+          branch = os.environ.get("GITHUB_REF_NAME", "")
+          full_sha = os.environ.get("GITHUB_SHA", "")
+          sha = full_sha[:7]
+          run_id = os.environ.get("GITHUB_RUN_ID", "")
+          run_url = f"https://github.com/{repo}/actions/runs/{run_id}"
+          commit_url = f"https://github.com/{repo}/commit/{full_sha}" if full_sha else run_url
+          max_size = 49 * 1024 * 1024
+
+          api_base = f"https://api.telegram.org/bot{token}"
+
+          def api_post(endpoint: str, fields: dict, files=None, timeout: int = 180):
+              url = f"{api_base}/{endpoint}"
+              if not files:
+                  data = urllib.parse.urlencode(fields).encode("utf-8")
+                  req = urllib.request.Request(url, data=data, method="POST")
+                  try:
+                      with urllib.request.urlopen(req, timeout=timeout) as resp:
+                          return resp.status, resp.read().decode("utf-8", "ignore")
+                  except urllib.error.HTTPError as e:
+                      return e.code, e.read().decode("utf-8", "ignore")
+                  except Exception as e:
+                      return None, str(e)
+
+              boundary = f"----fluidbox-{uuid.uuid4().hex}"
+              crlf = "\r\n"
+              body = bytearray()
+
+              for k, v in fields.items():
+                  body.extend(f"--{boundary}{crlf}".encode("utf-8"))
+                  body.extend(f'Content-Disposition: form-data; name="{k}"{crlf}{crlf}'.encode("utf-8"))
+                  body.extend(str(v).encode("utf-8", "ignore"))
+                  body.extend(crlf.encode("utf-8"))
+
+              for part_name, (filename, content_type, content_bytes) in files:
+                  body.extend(f"--{boundary}{crlf}".encode("utf-8"))
+                  body.extend(
+                      f'Content-Disposition: form-data; name="{part_name}"; filename="{filename}"{crlf}'.encode("utf-8")
+                  )
+                  body.extend(f"Content-Type: {content_type}{crlf}{crlf}".encode("utf-8"))
+                  body.extend(content_bytes)
+                  body.extend(crlf.encode("utf-8"))
+
+              body.extend(f"--{boundary}--{crlf}".encode("utf-8"))
+
+              req = urllib.request.Request(
+                  url,
+                  data=bytes(body),
+                  method="POST",
+                  headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=timeout) as resp:
+                      return resp.status, resp.read().decode("utf-8", "ignore")
+              except urllib.error.HTTPError as e:
+                  return e.code, e.read().decode("utf-8", "ignore")
+              except Exception as e:
+                  return None, str(e)
+
+          def is_ok(status, text) -> bool:
+              if status is None:
+                  return False
+              try:
+                  code = int(status)
+              except Exception:
+                  return False
+              if not (200 <= code < 300):
+                  return False
+              try:
+                  return bool(json.loads(text).get("ok", False))
+              except Exception:
+                  return False
+
+          def resolve_build_type(raw_channel: str) -> str:
+              if raw_channel == "release":
+                  return "Release build"
+              if raw_channel == "prerelease":
+                  return "Pre-Release build"
+              return "CI build"
+
+          def read_update_line() -> str:
+              event_path = os.environ.get("GITHUB_EVENT_PATH", "")
+              message = ""
+              if event_path and Path(event_path).is_file():
+                  try:
+                      payload = json.loads(Path(event_path).read_text(encoding="utf-8"))
+                      head_commit = payload.get("head_commit") or {}
+                      message = (head_commit.get("message") or "").strip()
+                  except Exception:
+                      message = ""
+
+              if not message:
+                  message = "Update from latest commit"
+
+              first_line = message.splitlines()[0].strip() if message else "Update from latest commit"
+              first_line = re.sub(r"\s+", " ", first_line).strip()
+              if len(first_line) > 180:
+                  first_line = first_line[:177].rstrip() + "..."
+              return first_line or "Update from latest commit"
+
+          build_type = resolve_build_type(channel)
+          update_line = read_update_line()
+          msg = (
+              "New push to GitHub!\n"
+              f"Type: {build_type}\n"
+              f"Branch: {branch}\n"
+              f"Commit: {sha}\n"
+              f'See commit detail <a href="{commit_url}">here</a>'
+          )
+
+          dist = Path("dist")
+          release_apk = next(iter(sorted(dist.glob("*-release.apk"))), None)
+          can_upload_apk = (
+              build_status == "success"
+              and release_apk is not None
+              and release_apk.is_file()
+              and release_apk.stat().st_size <= max_size
+          )
+
+          if can_upload_apk:
+              status, text = api_post(
+                  "sendDocument",
+                  {
+                      "chat_id": chat_id,
+                      "caption": msg,
+                      "parse_mode": "HTML",
+                  },
+                  files=[("document", (release_apk.name, "application/octet-stream", release_apk.read_bytes()))],
+              )
+              if is_ok(status, text):
+                  raise SystemExit(0)
+              print("Telegram APK upload failed, fallback to text message:")
+              print((text or "unknown error")[:800])
+
+          status, text = api_post(
+              "sendMessage",
+              {
+                  "chat_id": chat_id,
+                  "text": msg,
+                  "parse_mode": "HTML",
+                  "disable_web_page_preview": "true",
+              },
+              files=None,
+              timeout=30,
+          )
+          if not is_ok(status, text):
+              print("Telegram notification failed:")
+              print((text or "unknown error")[:800])
+
+          PY
+
+      - name: Publish APK files (non-CI)
+        if: steps.version.outputs.channel != 'ci'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.release_tag }}
+          name: ${{ steps.version.outputs.release_name }}
+          prerelease: ${{ steps.version.outputs.is_prerelease }}
+          target_commitish: ${{ github.sha }}
+          files: ${{ steps.apks.outputs.files }}
+          overwrite_files: true
+

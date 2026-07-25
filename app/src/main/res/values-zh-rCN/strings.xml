@@ -1,7 +1,7 @@
 ﻿<resources>
-    <string name="app_name">MiBox</string>
-    <string name="xposed_description">MiBox LSPosed 模块基础（原生通知图标 Hook）</string>
-    <string name="md3e_home_title">MiBox</string>
+    <string name="app_name">FluidBox</string>
+    <string name="xposed_description">FluidBox LSPosed 模块基础（原生通知图标 Hook）</string>
+    <string name="md3e_home_title">FluidBox</string>
 
     <string name="tab_home">首页</string>
     <string name="tab_features">功能</string>
@@ -14,8 +14,8 @@
     <string name="status_activated">已激活</string>
     <string name="status_inactive">未激活</string>
 
-    <string name="settings_hook_entry_title">MiBox 设置</string>
-    <string name="settings_hook_entry_summary">在系统设置中直接开关 MiBox 的 Xposed 功能。</string>
+    <string name="settings_hook_entry_title">FluidBox 设置</string>
+    <string name="settings_hook_entry_summary">在系统设置中直接开关 FluidBox 的 Xposed 功能。</string>
     <string name="settings_hook_category_notification_icons">通知图标</string>
     <string name="settings_hook_category_system_ui">系统界面</string>
     <string name="settings_hook_category_features">功能开关</string>
@@ -24,7 +24,7 @@
     <string name="settings_hook_restart_systemui_summary">通知图标或系统界面相关改动未立即生效时使用。</string>
     <string name="settings_hook_restart_systemui_done">已请求重启 SystemUI</string>
     <string name="settings_hook_restart_systemui_failed">重启 SystemUI 失败，请授予 Root 或手动重启。</string>
-    <string name="settings_hook_open_failed">无法打开 MiBox Hook 设置</string>
+    <string name="settings_hook_open_failed">无法打开 FluidBox Hook 设置</string>
 
     <string name="info_version">版本</string>
     <string name="info_package_name">包名</string>
@@ -189,7 +189,7 @@
     <string name="log_share_failed">分享失败：%1$s</string>
     <string name="log_copy_success">日志已复制。</string>
     <string name="log_clear_success">日志已清除。</string>
-    <string name="log_share_subject">MiBox 日志</string>
+    <string name="log_share_subject">FluidBox 日志</string>
     <string name="root_access_title">Root 状态</string>
     <string name="root_access_summary">检查是否已取得 Root 权限</string>
     <string name="root_access_status_checking">检测中...</string>
@@ -260,7 +260,7 @@
     <string name="battery_setting_live_notification_title">充电时显示即时资讯</string>
     <string name="battery_setting_live_notification_summary">充电时在即时通知显示功率、温度、电流与进度。</string>
     <string name="battery_setting_keep_background_title">允许背景执行</string>
-    <string name="battery_setting_keep_background_summary">申请忽略电池最佳化，让 MiBox 可在背景保持电池相关任务。</string>
+    <string name="battery_setting_keep_background_summary">申请忽略电池最佳化，让 FluidBox 可在背景保持电池相关任务。</string>
     <string name="battery_setting_dual_cell_title">双电芯模式</string>
     <string name="battery_setting_dual_cell_summary">适用于电流按单电芯回报的机型，会将电流与功率按双电芯修正。</string>
     <string name="battery_setting_series_battery_title">串联电池模式</string>

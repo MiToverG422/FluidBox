@@ -1,7 +1,7 @@
 ﻿<resources>
-    <string name="app_name">MiBox</string>
-    <string name="xposed_description">MiBox LSPosed module base for native notification icon hooks</string>
-    <string name="md3e_home_title">MiBox</string>
+    <string name="app_name">FluidBox</string>
+    <string name="xposed_description">FluidBox LSPosed module base for native notification icon hooks</string>
+    <string name="md3e_home_title">FluidBox</string>
 
     <string name="tab_home">Home</string>
     <string name="tab_features">Features</string>
@@ -14,8 +14,8 @@
     <string name="status_activated">Activated</string>
     <string name="status_inactive">Inactive</string>
 
-    <string name="settings_hook_entry_title">MiBox settings</string>
-    <string name="settings_hook_entry_summary">Toggle MiBox Xposed features directly in system settings.</string>
+    <string name="settings_hook_entry_title">FluidBox settings</string>
+    <string name="settings_hook_entry_summary">Toggle FluidBox Xposed features directly in system settings.</string>
     <string name="settings_hook_category_notification_icons">Notification icons</string>
     <string name="settings_hook_category_system_ui">System UI</string>
     <string name="settings_hook_category_features">Feature switches</string>
@@ -24,7 +24,7 @@
     <string name="settings_hook_restart_systemui_summary">Use this if notification icon or SystemUI changes do not apply immediately.</string>
     <string name="settings_hook_restart_systemui_done">SystemUI restart requested</string>
     <string name="settings_hook_restart_systemui_failed">Failed to restart SystemUI. Please grant root or reboot manually.</string>
-    <string name="settings_hook_open_failed">Unable to open MiBox Hook settings</string>
+    <string name="settings_hook_open_failed">Unable to open FluidBox Hook settings</string>
 
     <string name="info_version">Version</string>
     <string name="info_package_name">Package name</string>
@@ -189,7 +189,7 @@
     <string name="log_share_failed">Share failed: %1$s</string>
     <string name="log_copy_success">Logs copied.</string>
     <string name="log_clear_success">Logs cleared.</string>
-    <string name="log_share_subject">MiBox Log</string>
+    <string name="log_share_subject">FluidBox Log</string>
     <string name="root_access_title">Root status</string>
     <string name="root_access_summary">Check whether root permission is available</string>
     <string name="root_access_status_checking">Checking...</string>
@@ -260,7 +260,7 @@
     <string name="battery_setting_live_notification_title">Show live info while charging</string>
     <string name="battery_setting_live_notification_summary">Show power, temperature, current, and progress in live notification while charging.</string>
     <string name="battery_setting_keep_background_title">Allow background running</string>
-    <string name="battery_setting_keep_background_summary">Request ignoring battery optimization so MiBox can keep battery tasks running in background.</string>
+    <string name="battery_setting_keep_background_summary">Request ignoring battery optimization so FluidBox can keep battery tasks running in background.</string>
     <string name="battery_setting_dual_cell_title">Dual-cell mode</string>
     <string name="battery_setting_dual_cell_summary">For models reporting current by a single cell; current and power will be adjusted for dual cells.</string>
     <string name="battery_setting_series_battery_title">Series battery mode</string>

@@ -24,5 +24,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "OOS16 Toolbox"
+rootProject.name = "FluidBox"
 include(":app")

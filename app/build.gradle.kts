@@ -1,29 +1,29 @@
-plugins {
+﻿plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
 }
 
-val ciVersionName = (project.findProperty("OOS_VERSION_NAME") as String?)
+val ciVersionName = (project.findProperty("FLUIDBOX_VERSION_NAME") as String?)
     ?.takeIf { it.isNotBlank() }
     ?: "0.0.1"
 
-val ciVersionCode = (project.findProperty("OOS_VERSION_CODE") as String?)
+val ciVersionCode = (project.findProperty("FLUIDBOX_VERSION_CODE") as String?)
     ?.toIntOrNull()
     ?: 1
 
-val ciSignReleaseWithDebug = (project.findProperty("OOS_CI_SIGN_RELEASE_WITH_DEBUG") as String?)
+val ciSignReleaseWithDebug = (project.findProperty("FLUIDBOX_CI_SIGN_RELEASE_WITH_DEBUG") as String?)
     ?.toBooleanStrictOrNull()
     ?: false
 
 val isGithubCi = System.getenv("GITHUB_ACTIONS") == "true"
 
-val releaseStoreFilePath = (project.findProperty("OOS_RELEASE_STORE_FILE") as String?)
+val releaseStoreFilePath = (project.findProperty("FLUIDBOX_RELEASE_STORE_FILE") as String?)
     ?.takeIf { it.isNotBlank() }
-val releaseStorePassword = (project.findProperty("OOS_RELEASE_STORE_PASSWORD") as String?)
+val releaseStorePassword = (project.findProperty("FLUIDBOX_RELEASE_STORE_PASSWORD") as String?)
     ?.takeIf { it.isNotBlank() }
-val releaseKeyAlias = (project.findProperty("OOS_RELEASE_KEY_ALIAS") as String?)
+val releaseKeyAlias = (project.findProperty("FLUIDBOX_RELEASE_KEY_ALIAS") as String?)
     ?.takeIf { it.isNotBlank() }
-val releaseKeyPassword = (project.findProperty("OOS_RELEASE_KEY_PASSWORD") as String?)
+val releaseKeyPassword = (project.findProperty("FLUIDBOX_RELEASE_KEY_PASSWORD") as String?)
     ?.takeIf { it.isNotBlank() }
 
 val hasExternalReleaseSigning =
@@ -34,7 +34,7 @@ val hasExternalReleaseSigning =
     file(releaseStoreFilePath).exists()
 
 android {
-    namespace = "com.mi.mibox"
+    namespace = "com.mi.fluidbox"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -42,7 +42,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.mi.mibox"
+        applicationId = "com.mi.fluidbox"
         minSdk = 28
         targetSdk = 36
         versionCode = ciVersionCode
