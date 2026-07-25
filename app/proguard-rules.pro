@@ -21,4 +21,4 @@
 #-renamesourcefileattribute SourceFile
 
 # Keep modern LSPosed API entry class name referenced by META-INF/xposed/java_init.list.
--keep class com.mi.oostoolbox.lsp.OosLspModuleEntry { *; }
+-keep class com.mi.fluidbox.lsp.OosLspModuleEntry { *; }
