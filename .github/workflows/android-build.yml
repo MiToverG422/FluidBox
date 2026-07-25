@@ -203,8 +203,12 @@ jobs:
             HAS_RELEASE_SIGNING=true
             echo "Release signing keystore prepared"
           else
-            echo "::error::Release signing secrets are incomplete. CI/prerelease/release must use one unified signing certificate."
-            exit 1
+            if [[ "${{ steps.version.outputs.channel }}" == "ci" ]]; then
+              echo "::warning::Release signing secrets are incomplete. CI will use debug signing for this test build."
+            else
+              echo "::error::Release signing secrets are incomplete. Prerelease/release builds must use one unified signing certificate."
+              exit 1
+            fi
           fi
 
           echo "has_release_signing=${HAS_RELEASE_SIGNING}" >> "${GITHUB_OUTPUT}"
@@ -224,12 +228,15 @@ jobs:
             TASKS=(":app:assembleRelease")
           fi
 
-          if [ "${{ steps.signing.outputs.has_release_signing }}" != "true" ]; then
-            echo "::error::Release signing is required for all channels."
+          if [ "${{ steps.signing.outputs.has_release_signing }}" != "true" ] && [ "${{ steps.version.outputs.channel }}" != "ci" ]; then
+            echo "::error::Release signing is required for prerelease/release channels."
             exit 1
           fi
 
           SIGN_RELEASE_WITH_DEBUG=false
+          if [ "${{ steps.signing.outputs.has_release_signing }}" != "true" ]; then
+            SIGN_RELEASE_WITH_DEBUG=true
+          fi
 
           GRADLE_ARGS=(
             "-PFLUIDBOX_VERSION_NAME=${{ steps.version.outputs.version_name }}"
@@ -261,8 +268,8 @@ jobs:
           if [[ "${{ steps.version.outputs.build_variant }}" == "both" ]]; then
             DEBUG_APK="$(ls -1 app/build/outputs/apk/debug/*.apk | head -n 1)"
             RELEASE_APK="$(ls -1 app/build/outputs/apk/release/*.apk | head -n 1)"
-            DEBUG_OUT="dist/oos-toolbox-${SAFE_VERSION_NAME}-debug.apk"
-            RELEASE_OUT="dist/oos-toolbox-${SAFE_VERSION_NAME}-release.apk"
+            DEBUG_OUT="dist/fluidbox-${SAFE_VERSION_NAME}-debug.apk"
+            RELEASE_OUT="dist/fluidbox-${SAFE_VERSION_NAME}-release.apk"
             cp "${DEBUG_APK}" "${DEBUG_OUT}"
             cp "${RELEASE_APK}" "${RELEASE_OUT}"
             {
@@ -273,12 +280,12 @@ jobs:
             } >> "${GITHUB_OUTPUT}"
           elif [[ "${{ steps.version.outputs.build_variant }}" == "debug" ]]; then
             DEBUG_APK="$(ls -1 app/build/outputs/apk/debug/*.apk | head -n 1)"
-            DEBUG_OUT="dist/oos-toolbox-${SAFE_VERSION_NAME}-debug.apk"
+            DEBUG_OUT="dist/fluidbox-${SAFE_VERSION_NAME}-debug.apk"
             cp "${DEBUG_APK}" "${DEBUG_OUT}"
             echo "files=${DEBUG_OUT}" >> "${GITHUB_OUTPUT}"
           else
             RELEASE_APK="$(ls -1 app/build/outputs/apk/release/*.apk | head -n 1)"
-            RELEASE_OUT="dist/oos-toolbox-${SAFE_VERSION_NAME}-release.apk"
+            RELEASE_OUT="dist/fluidbox-${SAFE_VERSION_NAME}-release.apk"
             cp "${RELEASE_APK}" "${RELEASE_OUT}"
             echo "files=${RELEASE_OUT}" >> "${GITHUB_OUTPUT}"
           fi
@@ -287,7 +294,7 @@ jobs:
         if: steps.version.outputs.channel == 'ci'
         uses: actions/upload-artifact@v4
         with:
-          name: oos-toolbox-${{ steps.version.outputs.version_name }}
+          name: fluidbox-${{ steps.version.outputs.version_name }}
           path: dist/*.apk
 
       - name: Notify build to Telegram
