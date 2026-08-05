@@ -28,6 +28,11 @@ object LspConfig {
     private const val KEY_STATUS_MOBILE_TYPE_ENABLED = "status_mobile_type_enabled"
     private const val KEY_STATUS_MOBILE_TYPE_HIDE_DATA_OFF = "status_mobile_type_hide_data_off"
     private const val KEY_STATUS_MOBILE_TYPE_HIDE_WIFI = "status_mobile_type_hide_wifi"
+    private const val KEY_SYSTEMUI_HIDE_QS_EDIT = "systemui_hide_qs_edit"
+    private const val KEY_SYSTEMUI_HIDE_QS_SETTINGS = "systemui_hide_qs_settings"
+    private const val KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER = "systemui_hide_qs_top_carrier"
+    private const val KEY_SYSTEMUI_HIDE_QS_MORE = "systemui_hide_qs_more"
+    private const val KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY = "systemui_force_native_clipboard_overlay"
     private const val KEY_SETTINGS_FORCE_GOOGLE_ENTRY = "settings_force_google_entry"
     private const val KEY_LAUNCHER_REGION_MODE = "launcher_region_mode"
     private const val KEY_OOS_LOCALIZER_CONFIG_MODE = "oos_localizer_config_mode"
@@ -68,6 +73,11 @@ object LspConfig {
     private const val PROP_KEY_STATUS_MOBILE_TYPE_ENABLED = "oost.status_mobile_type"
     private const val PROP_KEY_STATUS_MOBILE_TYPE_HIDE_DATA_OFF = "oost.status_mobile_type_hide_data_off"
     private const val PROP_KEY_STATUS_MOBILE_TYPE_HIDE_WIFI = "oost.status_mobile_type_hide_wifi"
+    private const val PROP_KEY_SYSTEMUI_HIDE_QS_EDIT = "oost.systemui_hide_qs_edit"
+    private const val PROP_KEY_SYSTEMUI_HIDE_QS_SETTINGS = "oost.systemui_hide_qs_settings"
+    private const val PROP_KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER = "oost.systemui_hide_qs_top_carrier"
+    private const val PROP_KEY_SYSTEMUI_HIDE_QS_MORE = "oost.systemui_hide_qs_more"
+    private const val PROP_KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY = "oost.systemui_force_native_clipboard_overlay"
     private const val PROP_KEY_SETTINGS_FORCE_GOOGLE_ENTRY = "oost.settings_force_google_entry"
     private const val PROP_KEY_LAUNCHER_REGION_MODE = "oost.launcher_region_mode"
     private const val PROP_KEY_OOS_LOCALIZER_CONFIG_MODE = "oost.oos_localizer_config_mode"
@@ -92,6 +102,11 @@ object LspConfig {
     private const val PERSIST_PROP_KEY_STATUS_MOBILE_TYPE_ENABLED = "persist.sys.oost.status_mobile_type"
     private const val PERSIST_PROP_KEY_STATUS_MOBILE_TYPE_HIDE_DATA_OFF = "persist.sys.oost.status_mobile_type_hide_data_off"
     private const val PERSIST_PROP_KEY_STATUS_MOBILE_TYPE_HIDE_WIFI = "persist.sys.oost.status_mobile_type_hide_wifi"
+    private const val PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_EDIT = "persist.sys.oost.systemui_hide_qs_edit"
+    private const val PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_SETTINGS = "persist.sys.oost.systemui_hide_qs_settings"
+    private const val PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER = "persist.sys.oost.systemui_hide_qs_top_carrier"
+    private const val PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_MORE = "persist.sys.oost.systemui_hide_qs_more"
+    private const val PERSIST_PROP_KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY = "persist.sys.oost.systemui_force_native_clipboard_overlay"
     private const val PERSIST_PROP_KEY_SETTINGS_FORCE_GOOGLE_ENTRY = "persist.sys.oost.settings_force_google_entry"
     private const val PERSIST_PROP_KEY_LAUNCHER_REGION_MODE = "persist.sys.oost.launcher_region_mode"
     private const val PERSIST_PROP_KEY_OOS_LOCALIZER_CONFIG_MODE = "persist.sys.oost.oos_localizer_config_mode"
@@ -116,6 +131,11 @@ object LspConfig {
     private const val SETTINGS_KEY_STATUS_MOBILE_TYPE_ENABLED = "oost_status_mobile_type"
     private const val SETTINGS_KEY_STATUS_MOBILE_TYPE_HIDE_DATA_OFF = "oost_status_mobile_type_hide_data_off"
     private const val SETTINGS_KEY_STATUS_MOBILE_TYPE_HIDE_WIFI = "oost_status_mobile_type_hide_wifi"
+    private const val SETTINGS_KEY_SYSTEMUI_HIDE_QS_EDIT = "oost_systemui_hide_qs_edit"
+    private const val SETTINGS_KEY_SYSTEMUI_HIDE_QS_SETTINGS = "oost_systemui_hide_qs_settings"
+    private const val SETTINGS_KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER = "oost_systemui_hide_qs_top_carrier"
+    private const val SETTINGS_KEY_SYSTEMUI_HIDE_QS_MORE = "oost_systemui_hide_qs_more"
+    private const val SETTINGS_KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY = "oost_systemui_force_native_clipboard_overlay"
     private const val SETTINGS_KEY_SETTINGS_FORCE_GOOGLE_ENTRY = "oost_settings_force_google_entry"
     private const val SETTINGS_KEY_LAUNCHER_REGION_MODE = "oost_launcher_region_mode"
     private const val SETTINGS_KEY_OOS_LOCALIZER_CONFIG_MODE = "oost_oos_localizer_config_mode"
@@ -134,6 +154,11 @@ object LspConfig {
     private const val DEFAULT_STATUS_MOBILE_TYPE_ENABLED = false
     private const val DEFAULT_STATUS_MOBILE_TYPE_HIDE_DATA_OFF = false
     private const val DEFAULT_STATUS_MOBILE_TYPE_HIDE_WIFI = false
+    private const val DEFAULT_SYSTEMUI_HIDE_QS_EDIT = false
+    private const val DEFAULT_SYSTEMUI_HIDE_QS_SETTINGS = false
+    private const val DEFAULT_SYSTEMUI_HIDE_QS_TOP_CARRIER = false
+    private const val DEFAULT_SYSTEMUI_HIDE_QS_MORE = false
+    private const val DEFAULT_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY = false
     private const val DEFAULT_SETTINGS_FORCE_GOOGLE_ENTRY = false
     const val LAUNCHER_REGION_MODE_OFF = 0
     const val LAUNCHER_REGION_MODE_CN = 1
@@ -200,6 +225,11 @@ object LspConfig {
         val statusMobileTypeEnabled: Boolean,
         val statusMobileTypeHideDataOffEnabled: Boolean,
         val statusMobileTypeHideWifiEnabled: Boolean,
+        val systemUiHideQsEditEnabled: Boolean,
+        val systemUiHideQsSettingsEnabled: Boolean,
+        val systemUiHideQsTopCarrierEnabled: Boolean,
+        val systemUiHideQsMoreEnabled: Boolean,
+        val systemUiForceNativeClipboardOverlayEnabled: Boolean,
         val settingsForceGoogleEntryEnabled: Boolean,
         val oosLocalizerEnabled: Boolean,
         val oosLocalizerConfigMode: Int,
@@ -265,6 +295,26 @@ object LspConfig {
                 KEY_STATUS_MOBILE_TYPE_HIDE_WIFI,
                 DEFAULT_STATUS_MOBILE_TYPE_HIDE_WIFI
             ),
+            systemUiHideQsEditEnabled = prefs.getBoolean(
+                KEY_SYSTEMUI_HIDE_QS_EDIT,
+                DEFAULT_SYSTEMUI_HIDE_QS_EDIT
+            ),
+            systemUiHideQsSettingsEnabled = prefs.getBoolean(
+                KEY_SYSTEMUI_HIDE_QS_SETTINGS,
+                DEFAULT_SYSTEMUI_HIDE_QS_SETTINGS
+            ),
+            systemUiHideQsTopCarrierEnabled = prefs.getBoolean(
+                KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER,
+                DEFAULT_SYSTEMUI_HIDE_QS_TOP_CARRIER
+            ),
+            systemUiHideQsMoreEnabled = prefs.getBoolean(
+                KEY_SYSTEMUI_HIDE_QS_MORE,
+                DEFAULT_SYSTEMUI_HIDE_QS_MORE
+            ),
+            systemUiForceNativeClipboardOverlayEnabled = prefs.getBoolean(
+                KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY,
+                DEFAULT_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY
+            ),
             settingsForceGoogleEntryEnabled = prefs.getBoolean(
                 KEY_SETTINGS_FORCE_GOOGLE_ENTRY,
                 DEFAULT_SETTINGS_FORCE_GOOGLE_ENTRY
@@ -315,6 +365,11 @@ object LspConfig {
             statusMobileTypeEnabled = isStatusMobileTypeEnabled(context),
             statusMobileTypeHideDataOffEnabled = isStatusMobileTypeHideDataOffEnabled(context),
             statusMobileTypeHideWifiEnabled = isStatusMobileTypeHideWifiEnabled(context),
+            systemUiHideQsEditEnabled = isSystemUiHideQsEditEnabled(context),
+            systemUiHideQsSettingsEnabled = isSystemUiHideQsSettingsEnabled(context),
+            systemUiHideQsTopCarrierEnabled = isSystemUiHideQsTopCarrierEnabled(context),
+            systemUiHideQsMoreEnabled = isSystemUiHideQsMoreEnabled(context),
+            systemUiForceNativeClipboardOverlayEnabled = isSystemUiForceNativeClipboardOverlayEnabled(context),
             settingsForceGoogleEntryEnabled = isSettingsForceGoogleEntryEnabled(context),
             oosLocalizerEnabled = isOosLocalizerEnabled(context),
             oosLocalizerConfigMode = getOosLocalizerConfigMode(context),
@@ -905,6 +960,136 @@ object LspConfig {
         )
     }
 
+    fun isSystemUiHideQsEditEnabled(context: Context): Boolean {
+        return readSyncedToggle(
+            context = context,
+            persistPropertyKey = PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_EDIT,
+            propertyKey = PROP_KEY_SYSTEMUI_HIDE_QS_EDIT,
+            settingsKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_EDIT,
+            flagFilePath = null,
+            legacyFlagFilePath = null,
+            prefsKey = KEY_SYSTEMUI_HIDE_QS_EDIT,
+            defaultValue = DEFAULT_SYSTEMUI_HIDE_QS_EDIT
+        )
+    }
+
+    fun setSystemUiHideQsEditEnabled(context: Context, enabled: Boolean) {
+        setSyncedBooleanPreference(
+            context = context,
+            prefsKey = KEY_SYSTEMUI_HIDE_QS_EDIT,
+            enabled = enabled,
+            propertyKeys = listOf(
+                PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_EDIT,
+                PROP_KEY_SYSTEMUI_HIDE_QS_EDIT
+            ),
+            settingsGlobalKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_EDIT
+        )
+    }
+
+    fun isSystemUiHideQsSettingsEnabled(context: Context): Boolean {
+        return readSyncedToggle(
+            context = context,
+            persistPropertyKey = PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_SETTINGS,
+            propertyKey = PROP_KEY_SYSTEMUI_HIDE_QS_SETTINGS,
+            settingsKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_SETTINGS,
+            flagFilePath = null,
+            legacyFlagFilePath = null,
+            prefsKey = KEY_SYSTEMUI_HIDE_QS_SETTINGS,
+            defaultValue = DEFAULT_SYSTEMUI_HIDE_QS_SETTINGS
+        )
+    }
+
+    fun setSystemUiHideQsSettingsEnabled(context: Context, enabled: Boolean) {
+        setSyncedBooleanPreference(
+            context = context,
+            prefsKey = KEY_SYSTEMUI_HIDE_QS_SETTINGS,
+            enabled = enabled,
+            propertyKeys = listOf(
+                PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_SETTINGS,
+                PROP_KEY_SYSTEMUI_HIDE_QS_SETTINGS
+            ),
+            settingsGlobalKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_SETTINGS
+        )
+    }
+
+    fun isSystemUiHideQsTopCarrierEnabled(context: Context): Boolean {
+        return readSyncedToggle(
+            context = context,
+            persistPropertyKey = PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER,
+            propertyKey = PROP_KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER,
+            settingsKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER,
+            flagFilePath = null,
+            legacyFlagFilePath = null,
+            prefsKey = KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER,
+            defaultValue = DEFAULT_SYSTEMUI_HIDE_QS_TOP_CARRIER
+        )
+    }
+
+    fun setSystemUiHideQsTopCarrierEnabled(context: Context, enabled: Boolean) {
+        setSyncedBooleanPreference(
+            context = context,
+            prefsKey = KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER,
+            enabled = enabled,
+            propertyKeys = listOf(
+                PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER,
+                PROP_KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER
+            ),
+            settingsGlobalKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER
+        )
+    }
+
+    fun isSystemUiHideQsMoreEnabled(context: Context): Boolean {
+        return readSyncedToggle(
+            context = context,
+            persistPropertyKey = PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_MORE,
+            propertyKey = PROP_KEY_SYSTEMUI_HIDE_QS_MORE,
+            settingsKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_MORE,
+            flagFilePath = null,
+            legacyFlagFilePath = null,
+            prefsKey = KEY_SYSTEMUI_HIDE_QS_MORE,
+            defaultValue = DEFAULT_SYSTEMUI_HIDE_QS_MORE
+        )
+    }
+
+    fun setSystemUiHideQsMoreEnabled(context: Context, enabled: Boolean) {
+        setSyncedBooleanPreference(
+            context = context,
+            prefsKey = KEY_SYSTEMUI_HIDE_QS_MORE,
+            enabled = enabled,
+            propertyKeys = listOf(
+                PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_MORE,
+                PROP_KEY_SYSTEMUI_HIDE_QS_MORE
+            ),
+            settingsGlobalKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_MORE
+        )
+    }
+
+    fun isSystemUiForceNativeClipboardOverlayEnabled(context: Context): Boolean {
+        return readSyncedToggle(
+            context = context,
+            persistPropertyKey = PERSIST_PROP_KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY,
+            propertyKey = PROP_KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY,
+            settingsKey = SETTINGS_KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY,
+            flagFilePath = null,
+            legacyFlagFilePath = null,
+            prefsKey = KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY,
+            defaultValue = DEFAULT_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY
+        )
+    }
+
+    fun setSystemUiForceNativeClipboardOverlayEnabled(context: Context, enabled: Boolean) {
+        setSyncedBooleanPreference(
+            context = context,
+            prefsKey = KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY,
+            enabled = enabled,
+            propertyKeys = listOf(
+                PERSIST_PROP_KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY,
+                PROP_KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY
+            ),
+            settingsGlobalKey = SETTINGS_KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY
+        )
+    }
+
     fun isSettingsForceGoogleEntryEnabled(context: Context): Boolean {
         return readSyncedToggle(
             context = context,
@@ -975,6 +1160,11 @@ object LspConfig {
         val statusMobileType = isStatusMobileTypeEnabled(context)
         val statusMobileTypeHideDataOff = isStatusMobileTypeHideDataOffEnabled(context)
         val statusMobileTypeHideWifi = isStatusMobileTypeHideWifiEnabled(context)
+        val systemUiHideQsEdit = isSystemUiHideQsEditEnabled(context)
+        val systemUiHideQsSettings = isSystemUiHideQsSettingsEnabled(context)
+        val systemUiHideQsTopCarrier = isSystemUiHideQsTopCarrierEnabled(context)
+        val systemUiHideQsMore = isSystemUiHideQsMoreEnabled(context)
+        val systemUiForceNativeClipboardOverlay = isSystemUiForceNativeClipboardOverlayEnabled(context)
         val settingsForceGoogleEntry = isSettingsForceGoogleEntryEnabled(context)
         val launcherRegionMode = getLauncherRegionMode(context)
         val oosLocalizerConfigMode = getOosLocalizerConfigMode(context)
@@ -1131,6 +1321,46 @@ object LspConfig {
                 PROP_KEY_STATUS_MOBILE_TYPE_HIDE_WIFI
             ),
             settingsGlobalKey = SETTINGS_KEY_STATUS_MOBILE_TYPE_HIDE_WIFI
+        )
+        syncScalarState(
+            value = if (systemUiHideQsEdit) "1" else "0",
+            propertyKeys = listOf(
+                PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_EDIT,
+                PROP_KEY_SYSTEMUI_HIDE_QS_EDIT
+            ),
+            settingsGlobalKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_EDIT
+        )
+        syncScalarState(
+            value = if (systemUiHideQsSettings) "1" else "0",
+            propertyKeys = listOf(
+                PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_SETTINGS,
+                PROP_KEY_SYSTEMUI_HIDE_QS_SETTINGS
+            ),
+            settingsGlobalKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_SETTINGS
+        )
+        syncScalarState(
+            value = if (systemUiHideQsTopCarrier) "1" else "0",
+            propertyKeys = listOf(
+                PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER,
+                PROP_KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER
+            ),
+            settingsGlobalKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER
+        )
+        syncScalarState(
+            value = if (systemUiHideQsMore) "1" else "0",
+            propertyKeys = listOf(
+                PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_MORE,
+                PROP_KEY_SYSTEMUI_HIDE_QS_MORE
+            ),
+            settingsGlobalKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_MORE
+        )
+        syncScalarState(
+            value = if (systemUiForceNativeClipboardOverlay) "1" else "0",
+            propertyKeys = listOf(
+                PERSIST_PROP_KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY,
+                PROP_KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY
+            ),
+            settingsGlobalKey = SETTINGS_KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY
         )
         syncScalarState(
             value = if (settingsForceGoogleEntry) "1" else "0",
@@ -1511,6 +1741,56 @@ object LspConfig {
             settingsKey = SETTINGS_KEY_STATUS_MOBILE_TYPE_HIDE_WIFI,
             prefsKey = KEY_STATUS_MOBILE_TYPE_HIDE_WIFI,
             defaultValue = DEFAULT_STATUS_MOBILE_TYPE_HIDE_WIFI
+        )
+    }
+
+    fun isSystemUiHideQsEditEnabledXposed(): Boolean {
+        return readXposedBoolean(
+            persistPropertyKey = PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_EDIT,
+            propertyKey = PROP_KEY_SYSTEMUI_HIDE_QS_EDIT,
+            settingsKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_EDIT,
+            prefsKey = KEY_SYSTEMUI_HIDE_QS_EDIT,
+            defaultValue = DEFAULT_SYSTEMUI_HIDE_QS_EDIT
+        )
+    }
+
+    fun isSystemUiHideQsSettingsEnabledXposed(): Boolean {
+        return readXposedBoolean(
+            persistPropertyKey = PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_SETTINGS,
+            propertyKey = PROP_KEY_SYSTEMUI_HIDE_QS_SETTINGS,
+            settingsKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_SETTINGS,
+            prefsKey = KEY_SYSTEMUI_HIDE_QS_SETTINGS,
+            defaultValue = DEFAULT_SYSTEMUI_HIDE_QS_SETTINGS
+        )
+    }
+
+    fun isSystemUiHideQsTopCarrierEnabledXposed(): Boolean {
+        return readXposedBoolean(
+            persistPropertyKey = PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER,
+            propertyKey = PROP_KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER,
+            settingsKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER,
+            prefsKey = KEY_SYSTEMUI_HIDE_QS_TOP_CARRIER,
+            defaultValue = DEFAULT_SYSTEMUI_HIDE_QS_TOP_CARRIER
+        )
+    }
+
+    fun isSystemUiHideQsMoreEnabledXposed(): Boolean {
+        return readXposedBoolean(
+            persistPropertyKey = PERSIST_PROP_KEY_SYSTEMUI_HIDE_QS_MORE,
+            propertyKey = PROP_KEY_SYSTEMUI_HIDE_QS_MORE,
+            settingsKey = SETTINGS_KEY_SYSTEMUI_HIDE_QS_MORE,
+            prefsKey = KEY_SYSTEMUI_HIDE_QS_MORE,
+            defaultValue = DEFAULT_SYSTEMUI_HIDE_QS_MORE
+        )
+    }
+
+    fun isSystemUiForceNativeClipboardOverlayEnabledXposed(): Boolean {
+        return readXposedBoolean(
+            persistPropertyKey = PERSIST_PROP_KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY,
+            propertyKey = PROP_KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY,
+            settingsKey = SETTINGS_KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY,
+            prefsKey = KEY_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY,
+            defaultValue = DEFAULT_SYSTEMUI_FORCE_NATIVE_CLIPBOARD_OVERLAY
         )
     }
 

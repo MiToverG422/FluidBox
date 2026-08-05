@@ -107,6 +107,8 @@
     <string name="feature_native_notify_icon_summary">Enable native icon style, This feature cannot fully cover all cases and still requires app-side adaptation</string>
     <string name="feature_native_notification_bubbles_title">Native notification bubbles</string>
     <string name="feature_native_notification_bubbles_summary">Force-enable Android conversation bubbles in framework, ColorOS CN only, Requires system restart</string>
+    <string name="feature_force_native_clipboard_overlay_title">Native clipboard</string>
+    <string name="feature_force_native_clipboard_overlay_summary">Force-enable the bottom-left native clipboard entry</string>
     <string name="feature_group_beautify">Beautify</string>
     <string name="feature_status_mobile_type_title">Mobile network signal icon</string>
     <string name="feature_status_mobile_type_summary">Adjust 5G icon position and visibility rules</string>
@@ -114,6 +116,15 @@
     <string name="feature_status_mobile_type_hide_data_off_summary">Hide the status bar mobile network type icon when mobile data is off</string>
     <string name="feature_status_mobile_type_hide_wifi_title">Hide when Wi-Fi is connected</string>
     <string name="feature_status_mobile_type_hide_wifi_summary">Hide the status bar mobile network type icon when Wi-Fi is connected</string>
+    <string name="feature_group_control_center">Control Center</string>
+    <string name="feature_hide_qs_edit_title">Hide edit switch</string>
+    <string name="feature_hide_qs_edit_summary">Hide the edit switch entry in the Control Center top-right menu</string>
+    <string name="feature_hide_qs_settings_title">Hide Control Center settings button</string>
+    <string name="feature_hide_qs_settings_summary">Hide the settings button that opens system Settings from Control Center</string>
+    <string name="feature_hide_qs_top_carrier_title">Hide top carrier</string>
+    <string name="feature_hide_qs_top_carrier_summary">Hide the carrier text at the top of Control Center</string>
+    <string name="feature_hide_qs_more_title">Hide Control Center more entry</string>
+    <string name="feature_hide_qs_more_summary">Hide the round more button in the top-right corner of Control Center</string>
     <string name="feature_group_minus_one">Minus one page</string>
     <string name="feature_group_region">Region</string>
     <string name="feature_group_layout">Layout</string>

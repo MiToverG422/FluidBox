@@ -153,6 +153,21 @@ class MainActivity : ComponentActivity() {
             var statusMobileTypeHideWifiEnabled by rememberSaveable {
                 mutableStateOf(initialLspConfig.statusMobileTypeHideWifiEnabled)
             }
+            var systemUiHideQsEditEnabled by rememberSaveable {
+                mutableStateOf(initialLspConfig.systemUiHideQsEditEnabled)
+            }
+            var systemUiHideQsSettingsEnabled by rememberSaveable {
+                mutableStateOf(initialLspConfig.systemUiHideQsSettingsEnabled)
+            }
+            var systemUiHideQsTopCarrierEnabled by rememberSaveable {
+                mutableStateOf(initialLspConfig.systemUiHideQsTopCarrierEnabled)
+            }
+            var systemUiHideQsMoreEnabled by rememberSaveable {
+                mutableStateOf(initialLspConfig.systemUiHideQsMoreEnabled)
+            }
+            var systemUiForceNativeClipboardOverlayEnabled by rememberSaveable {
+                mutableStateOf(initialLspConfig.systemUiForceNativeClipboardOverlayEnabled)
+            }
             var settingsForceGoogleEntryEnabled by rememberSaveable {
                 mutableStateOf(initialLspConfig.settingsForceGoogleEntryEnabled)
             }
@@ -242,6 +257,11 @@ class MainActivity : ComponentActivity() {
                 statusMobileTypeEnabled = snapshot.statusMobileTypeEnabled
                 statusMobileTypeHideDataOffEnabled = snapshot.statusMobileTypeHideDataOffEnabled
                 statusMobileTypeHideWifiEnabled = snapshot.statusMobileTypeHideWifiEnabled
+                systemUiHideQsEditEnabled = snapshot.systemUiHideQsEditEnabled
+                systemUiHideQsSettingsEnabled = snapshot.systemUiHideQsSettingsEnabled
+                systemUiHideQsTopCarrierEnabled = snapshot.systemUiHideQsTopCarrierEnabled
+                systemUiHideQsMoreEnabled = snapshot.systemUiHideQsMoreEnabled
+                systemUiForceNativeClipboardOverlayEnabled = snapshot.systemUiForceNativeClipboardOverlayEnabled
                 settingsForceGoogleEntryEnabled = snapshot.settingsForceGoogleEntryEnabled
                 oosLocalizerEnabled = snapshot.oosLocalizerEnabled
                 oosLocalizerConfigMode = snapshot.oosLocalizerConfigMode
@@ -449,6 +469,47 @@ class MainActivity : ComponentActivity() {
                 AppLogStore.i(
                     "StatusMobileType",
                     "Mobile type hide on Wi-Fi: $statusMobileTypeHideWifiEnabled"
+                )
+            }
+            LaunchedEffect(systemUiHideQsEditEnabled) {
+                if (!settingsEffectsReady) return@LaunchedEffect
+                withContext(Dispatchers.IO) {
+                    LspConfig.setSystemUiHideQsEditEnabled(this@MainActivity, systemUiHideQsEditEnabled)
+                }
+                AppLogStore.i("SystemUI", "Hide QS edit entry: $systemUiHideQsEditEnabled")
+            }
+            LaunchedEffect(systemUiHideQsSettingsEnabled) {
+                if (!settingsEffectsReady) return@LaunchedEffect
+                withContext(Dispatchers.IO) {
+                    LspConfig.setSystemUiHideQsSettingsEnabled(this@MainActivity, systemUiHideQsSettingsEnabled)
+                }
+                AppLogStore.i("SystemUI", "Hide QS settings button: $systemUiHideQsSettingsEnabled")
+            }
+            LaunchedEffect(systemUiHideQsTopCarrierEnabled) {
+                if (!settingsEffectsReady) return@LaunchedEffect
+                withContext(Dispatchers.IO) {
+                    LspConfig.setSystemUiHideQsTopCarrierEnabled(this@MainActivity, systemUiHideQsTopCarrierEnabled)
+                }
+                AppLogStore.i("SystemUI", "Hide QS top carrier: $systemUiHideQsTopCarrierEnabled")
+            }
+            LaunchedEffect(systemUiHideQsMoreEnabled) {
+                if (!settingsEffectsReady) return@LaunchedEffect
+                withContext(Dispatchers.IO) {
+                    LspConfig.setSystemUiHideQsMoreEnabled(this@MainActivity, systemUiHideQsMoreEnabled)
+                }
+                AppLogStore.i("SystemUI", "Hide QS more entry: $systemUiHideQsMoreEnabled")
+            }
+            LaunchedEffect(systemUiForceNativeClipboardOverlayEnabled) {
+                if (!settingsEffectsReady) return@LaunchedEffect
+                withContext(Dispatchers.IO) {
+                    LspConfig.setSystemUiForceNativeClipboardOverlayEnabled(
+                        this@MainActivity,
+                        systemUiForceNativeClipboardOverlayEnabled
+                    )
+                }
+                AppLogStore.i(
+                    "SystemUI",
+                    "Force native clipboard overlay: $systemUiForceNativeClipboardOverlayEnabled"
                 )
             }
             LaunchedEffect(settingsForceGoogleEntryEnabled) {
@@ -706,6 +767,18 @@ class MainActivity : ComponentActivity() {
                 },
                 statusMobileTypeHideWifiEnabled = statusMobileTypeHideWifiEnabled,
                 onStatusMobileTypeHideWifiEnabledChange = { statusMobileTypeHideWifiEnabled = it },
+                systemUiHideQsEditEnabled = systemUiHideQsEditEnabled,
+                onSystemUiHideQsEditEnabledChange = { systemUiHideQsEditEnabled = it },
+                systemUiHideQsSettingsEnabled = systemUiHideQsSettingsEnabled,
+                onSystemUiHideQsSettingsEnabledChange = { systemUiHideQsSettingsEnabled = it },
+                systemUiHideQsTopCarrierEnabled = systemUiHideQsTopCarrierEnabled,
+                onSystemUiHideQsTopCarrierEnabledChange = { systemUiHideQsTopCarrierEnabled = it },
+                systemUiHideQsMoreEnabled = systemUiHideQsMoreEnabled,
+                onSystemUiHideQsMoreEnabledChange = { systemUiHideQsMoreEnabled = it },
+                systemUiForceNativeClipboardOverlayEnabled = systemUiForceNativeClipboardOverlayEnabled,
+                onSystemUiForceNativeClipboardOverlayEnabledChange = {
+                    systemUiForceNativeClipboardOverlayEnabled = it
+                },
                 settingsForceGoogleEntryEnabled = settingsForceGoogleEntryEnabled,
                 onSettingsForceGoogleEntryEnabledChange = { settingsForceGoogleEntryEnabled = it },
                 extremeRefresh165Enabled = extremeRefresh165Enabled,

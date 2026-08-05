@@ -25,9 +25,9 @@ object UpdateChannelPreference {
     fun get(context: Context): UpdateChannel {
         val raw = context
             .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getString(KEY_UPDATE_CHANNEL, UpdateChannel.GitHubReleases.name)
+            .getString(KEY_UPDATE_CHANNEL, UpdateChannel.GitHubCi.name)
         return UpdateChannel.entries.firstOrNull { it.name == raw }
-            ?: UpdateChannel.GitHubReleases
+            ?: UpdateChannel.GitHubCi
     }
 
     fun set(context: Context, channel: UpdateChannel) {

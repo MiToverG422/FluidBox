@@ -428,13 +428,12 @@ jobs:
 
           PY
 
-      - name: Publish APK files (non-CI)
-        if: steps.version.outputs.channel != 'ci'
+      - name: Publish APK files
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.release_tag }}
           name: ${{ steps.version.outputs.release_name }}
-          prerelease: false
+          prerelease: ${{ steps.version.outputs.channel == 'ci' }}
           target_commitish: ${{ github.sha }}
           files: ${{ steps.apks.outputs.files }}
           overwrite_files: true

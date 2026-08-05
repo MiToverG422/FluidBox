@@ -169,6 +169,16 @@ fun FeatureSubRoute(
     onStatusMobileTypeHideDataOffEnabledChange: (Boolean) -> Unit,
     statusMobileTypeHideWifiEnabled: Boolean,
     onStatusMobileTypeHideWifiEnabledChange: (Boolean) -> Unit,
+    systemUiHideQsEditEnabled: Boolean,
+    onSystemUiHideQsEditEnabledChange: (Boolean) -> Unit,
+    systemUiHideQsSettingsEnabled: Boolean,
+    onSystemUiHideQsSettingsEnabledChange: (Boolean) -> Unit,
+    systemUiHideQsTopCarrierEnabled: Boolean,
+    onSystemUiHideQsTopCarrierEnabledChange: (Boolean) -> Unit,
+    systemUiHideQsMoreEnabled: Boolean,
+    onSystemUiHideQsMoreEnabledChange: (Boolean) -> Unit,
+    systemUiForceNativeClipboardOverlayEnabled: Boolean,
+    onSystemUiForceNativeClipboardOverlayEnabledChange: (Boolean) -> Unit,
     settingsForceGoogleEntryEnabled: Boolean,
     onSettingsForceGoogleEntryEnabledChange: (Boolean) -> Unit,
     extremeRefresh165Enabled: Boolean,
@@ -321,6 +331,16 @@ fun FeatureSubRoute(
                 onStatusMobileTypeHideDataOffEnabledChange = onStatusMobileTypeHideDataOffEnabledChange,
                 statusMobileTypeHideWifiEnabled = statusMobileTypeHideWifiEnabled,
                 onStatusMobileTypeHideWifiEnabledChange = onStatusMobileTypeHideWifiEnabledChange,
+                systemUiHideQsEditEnabled = systemUiHideQsEditEnabled,
+                onSystemUiHideQsEditEnabledChange = onSystemUiHideQsEditEnabledChange,
+                systemUiHideQsSettingsEnabled = systemUiHideQsSettingsEnabled,
+                onSystemUiHideQsSettingsEnabledChange = onSystemUiHideQsSettingsEnabledChange,
+                systemUiHideQsTopCarrierEnabled = systemUiHideQsTopCarrierEnabled,
+                onSystemUiHideQsTopCarrierEnabledChange = onSystemUiHideQsTopCarrierEnabledChange,
+                systemUiHideQsMoreEnabled = systemUiHideQsMoreEnabled,
+                onSystemUiHideQsMoreEnabledChange = onSystemUiHideQsMoreEnabledChange,
+                systemUiForceNativeClipboardOverlayEnabled = systemUiForceNativeClipboardOverlayEnabled,
+                onSystemUiForceNativeClipboardOverlayEnabledChange = onSystemUiForceNativeClipboardOverlayEnabledChange,
                 settingsForceGoogleEntryEnabled = settingsForceGoogleEntryEnabled,
                 onSettingsForceGoogleEntryEnabledChange = onSettingsForceGoogleEntryEnabledChange,
                 extremeRefresh165Enabled = extremeRefresh165Enabled,
@@ -606,6 +626,16 @@ private fun FeatureSubPage(
     onStatusMobileTypeHideDataOffEnabledChange: (Boolean) -> Unit,
     statusMobileTypeHideWifiEnabled: Boolean,
     onStatusMobileTypeHideWifiEnabledChange: (Boolean) -> Unit,
+    systemUiHideQsEditEnabled: Boolean,
+    onSystemUiHideQsEditEnabledChange: (Boolean) -> Unit,
+    systemUiHideQsSettingsEnabled: Boolean,
+    onSystemUiHideQsSettingsEnabledChange: (Boolean) -> Unit,
+    systemUiHideQsTopCarrierEnabled: Boolean,
+    onSystemUiHideQsTopCarrierEnabledChange: (Boolean) -> Unit,
+    systemUiHideQsMoreEnabled: Boolean,
+    onSystemUiHideQsMoreEnabledChange: (Boolean) -> Unit,
+    systemUiForceNativeClipboardOverlayEnabled: Boolean,
+    onSystemUiForceNativeClipboardOverlayEnabledChange: (Boolean) -> Unit,
     settingsForceGoogleEntryEnabled: Boolean,
     onSettingsForceGoogleEntryEnabledChange: (Boolean) -> Unit,
     extremeRefresh165Enabled: Boolean,
@@ -671,6 +701,16 @@ private fun FeatureSubPage(
             onStatusMobileTypeHideDataOffEnabledChange = onStatusMobileTypeHideDataOffEnabledChange,
             statusMobileTypeHideWifiEnabled = statusMobileTypeHideWifiEnabled,
             onStatusMobileTypeHideWifiEnabledChange = onStatusMobileTypeHideWifiEnabledChange,
+            systemUiHideQsEditEnabled = systemUiHideQsEditEnabled,
+            onSystemUiHideQsEditEnabledChange = onSystemUiHideQsEditEnabledChange,
+            systemUiHideQsSettingsEnabled = systemUiHideQsSettingsEnabled,
+            onSystemUiHideQsSettingsEnabledChange = onSystemUiHideQsSettingsEnabledChange,
+            systemUiHideQsTopCarrierEnabled = systemUiHideQsTopCarrierEnabled,
+            onSystemUiHideQsTopCarrierEnabledChange = onSystemUiHideQsTopCarrierEnabledChange,
+            systemUiHideQsMoreEnabled = systemUiHideQsMoreEnabled,
+            onSystemUiHideQsMoreEnabledChange = onSystemUiHideQsMoreEnabledChange,
+            systemUiForceNativeClipboardOverlayEnabled = systemUiForceNativeClipboardOverlayEnabled,
+            onSystemUiForceNativeClipboardOverlayEnabledChange = onSystemUiForceNativeClipboardOverlayEnabledChange,
         )
         FeaturePageMode.Settings -> SettingsFeaturesPage(
             permissionMonitorVisible = permissionMonitorVisible,
@@ -948,6 +988,16 @@ private fun SystemUiFeaturesPage(
     onStatusMobileTypeHideDataOffEnabledChange: (Boolean) -> Unit,
     statusMobileTypeHideWifiEnabled: Boolean,
     onStatusMobileTypeHideWifiEnabledChange: (Boolean) -> Unit,
+    systemUiHideQsEditEnabled: Boolean,
+    onSystemUiHideQsEditEnabledChange: (Boolean) -> Unit,
+    systemUiHideQsSettingsEnabled: Boolean,
+    onSystemUiHideQsSettingsEnabledChange: (Boolean) -> Unit,
+    systemUiHideQsTopCarrierEnabled: Boolean,
+    onSystemUiHideQsTopCarrierEnabledChange: (Boolean) -> Unit,
+    systemUiHideQsMoreEnabled: Boolean,
+    onSystemUiHideQsMoreEnabledChange: (Boolean) -> Unit,
+    systemUiForceNativeClipboardOverlayEnabled: Boolean,
+    onSystemUiForceNativeClipboardOverlayEnabledChange: (Boolean) -> Unit,
 ) {
     SettingsSection(title = stringResource(R.string.feature_group_native))
     SettingsGroup {
@@ -956,7 +1006,7 @@ private fun SystemUiFeaturesPage(
             summary = stringResource(R.string.feature_native_notify_icon_summary),
             checked = nativeNotifyIconEnabled,
             onCheckedChange = onNativeNotifyIconEnabledChange,
-            hasDividerBelow = showChinaSpecialFeatures,
+            hasDividerBelow = true,
         )
         if (showChinaSpecialFeatures) {
             SettingsDivider()
@@ -966,8 +1016,17 @@ private fun SystemUiFeaturesPage(
                 checked = nativeNotificationBubblesEnabled,
                 onCheckedChange = onNativeNotificationBubblesEnabledChange,
                 hasDividerAbove = true,
+                hasDividerBelow = true,
             )
         }
+        SettingsDivider()
+        SettingsToggleRow(
+            title = stringResource(R.string.feature_force_native_clipboard_overlay_title),
+            summary = stringResource(R.string.feature_force_native_clipboard_overlay_summary),
+            checked = systemUiForceNativeClipboardOverlayEnabled,
+            onCheckedChange = onSystemUiForceNativeClipboardOverlayEnabledChange,
+            hasDividerAbove = true,
+        )
     }
 
     SettingsSection(title = stringResource(R.string.feature_group_beautify))
@@ -994,6 +1053,43 @@ private fun SystemUiFeaturesPage(
             summary = stringResource(R.string.feature_status_mobile_type_hide_wifi_summary),
             checked = statusMobileTypeHideWifiEnabled,
             onCheckedChange = onStatusMobileTypeHideWifiEnabledChange,
+            hasDividerAbove = true,
+        )
+    }
+
+    SettingsSection(title = stringResource(R.string.feature_group_control_center))
+    SettingsGroup {
+        SettingsToggleRow(
+            title = stringResource(R.string.feature_hide_qs_edit_title),
+            summary = stringResource(R.string.feature_hide_qs_edit_summary),
+            checked = systemUiHideQsEditEnabled,
+            onCheckedChange = onSystemUiHideQsEditEnabledChange,
+            hasDividerBelow = true,
+        )
+        SettingsDivider()
+        SettingsToggleRow(
+            title = stringResource(R.string.feature_hide_qs_settings_title),
+            summary = stringResource(R.string.feature_hide_qs_settings_summary),
+            checked = systemUiHideQsSettingsEnabled,
+            onCheckedChange = onSystemUiHideQsSettingsEnabledChange,
+            hasDividerAbove = true,
+            hasDividerBelow = true,
+        )
+        SettingsDivider()
+        SettingsToggleRow(
+            title = stringResource(R.string.feature_hide_qs_top_carrier_title),
+            summary = stringResource(R.string.feature_hide_qs_top_carrier_summary),
+            checked = systemUiHideQsTopCarrierEnabled,
+            onCheckedChange = onSystemUiHideQsTopCarrierEnabledChange,
+            hasDividerAbove = true,
+            hasDividerBelow = true,
+        )
+        SettingsDivider()
+        SettingsToggleRow(
+            title = stringResource(R.string.feature_hide_qs_more_title),
+            summary = stringResource(R.string.feature_hide_qs_more_summary),
+            checked = systemUiHideQsMoreEnabled,
+            onCheckedChange = onSystemUiHideQsMoreEnabledChange,
             hasDividerAbove = true,
         )
     }

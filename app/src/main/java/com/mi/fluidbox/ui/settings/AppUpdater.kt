@@ -40,7 +40,7 @@ object AppUpdater {
                     UpdateChannel.GitHubCi -> findLatestCiArtifact()
                 } ?: return@withContext UpdateResult.NoUpdate
 
-                if (!isNewerVersion(update.versionName, BuildConfig.VERSION_NAME)) {
+                if (!isNewerUpdate(update)) {
                     return@withContext UpdateResult.NoUpdate
                 }
 
@@ -83,24 +83,36 @@ object AppUpdater {
     }
 
     private fun findLatestRelease(): UpdatePackage? {
-        val json = JSONObject(getText("$API_BASE/releases/latest"))
-        val versionName = json.optString("tag_name")
-            .removePrefix("v")
-            .ifBlank { json.optString("name").removePrefix("FluidBox ").trim() }
+        return findLatestReleaseAsset("$API_BASE/releases/latest")
+    }
+
+    private fun findLatestCiRelease(): UpdatePackage? {
+        return runCatching {
+            findLatestReleaseAsset("$API_BASE/releases/tags/ci-latest")
+        }.getOrNull()
+    }
+
+    private fun findLatestReleaseAsset(url: String): UpdatePackage? {
+        val json = JSONObject(getText(url))
         val assets = json.optJSONArray("assets") ?: JSONArray()
         val asset = firstApkAsset(assets) ?: return null
+        val assetName = asset.optString("name", "")
+        val versionName = extractReleaseVersionName(
+            tagName = json.optString("tag_name"),
+            releaseName = json.optString("name"),
+            assetName = assetName,
+        ) ?: return null
         return UpdatePackage(
             versionName = versionName,
             downloadUrl = asset.getString("browser_download_url"),
-            fileName = asset.optString("name", "fluidbox-$versionName-release.apk"),
+            fileName = assetName.ifBlank { "fluidbox-$versionName-release.apk" },
             kind = UpdatePackageKind.Apk,
         )
     }
 
     private fun findLatestCiArtifact(): UpdatePackage? {
-        val runsJson = JSONObject(
-            getText("$API_BASE/actions/runs?branch=master&status=success&per_page=10")
-        )
+        findLatestCiRelease()?.let { return it }
+        val runsJson = getLatestCiRunsJson()
         val runs = runsJson.optJSONArray("workflow_runs") ?: return null
         for (runIndex in 0 until runs.length()) {
             val run = runs.optJSONObject(runIndex) ?: continue
@@ -115,14 +127,31 @@ object AppUpdater {
                     .orEmpty()
             }
             if (versionName.isBlank()) continue
-            return UpdatePackage(
-                versionName = versionName,
-                downloadUrl = artifact.getString("archive_download_url"),
-                fileName = "$artifactName.zip",
-                kind = UpdatePackageKind.ArtifactZip,
-            )
+            if (run.optLong("run_number") > BuildConfig.VERSION_CODE.toLong()) {
+                error("CI APK is not published to ci-latest release yet")
+            }
+            return null
         }
         return null
+    }
+
+    private fun getLatestCiRunsJson(): JSONObject {
+        val requests = listOf(
+            "$API_BASE/actions/runs?branch=main&status=success&per_page=10",
+            "$API_BASE/actions/runs?branch=master&status=success&per_page=10",
+            "$API_BASE/actions/runs?status=success&per_page=10",
+        )
+        var lastError: Throwable? = null
+        for (request in requests) {
+            val result = runCatching { JSONObject(getText(request)) }
+            val json = result.getOrNull()
+            if (json?.optJSONArray("workflow_runs")?.length()?.let { it > 0 } == true) {
+                return json
+            }
+            lastError = result.exceptionOrNull()
+        }
+        lastError?.let { throw it }
+        return JSONObject("""{"workflow_runs":[]}""")
     }
 
     private fun firstApkAsset(assets: JSONArray): JSONObject? {
@@ -155,6 +184,31 @@ object AppUpdater {
             }
         }
         return null
+    }
+
+    private fun extractReleaseVersionName(
+        tagName: String,
+        releaseName: String,
+        assetName: String,
+    ): String? {
+        val candidates = listOf(
+            tagName.removePrefix("v"),
+            releaseName
+                .removePrefix("FluidBox CI Latest ")
+                .removePrefix("FluidBox "),
+            assetName
+                .removePrefix("fluidbox-")
+                .removeSuffix(".apk")
+                .removeSuffix("-release")
+                .removeSuffix("-debug"),
+        )
+        return candidates
+            .map { it.trim() }
+            .firstOrNull { candidate -> candidate.isComparableVersionName() }
+            ?: candidates
+                .asSequence()
+                .mapNotNull { candidate -> VERSION_NAME_REGEX.find(candidate)?.value }
+                .firstOrNull()
     }
 
     private fun downloadApk(
@@ -279,6 +333,11 @@ object AppUpdater {
         return File(updateDir, fileName)
     }
 
+    private fun isNewerUpdate(update: UpdatePackage): Boolean {
+        if (isNewerVersion(update.versionName, BuildConfig.VERSION_NAME)) return true
+        return update.versionCode?.let { it > BuildConfig.VERSION_CODE.toLong() } == true
+    }
+
     private fun isNewerVersion(remote: String, current: String): Boolean {
         if (remote.isBlank()) return false
         if (remote == current) return false
@@ -299,6 +358,10 @@ object AppUpdater {
             .mapNotNull { it.toIntOrNull() }
     }
 
+    private fun String.isComparableVersionName(): Boolean {
+        return matches(VERSION_NAME_REGEX)
+    }
+
     private fun String.ensureApkSuffix() =
         if (lowercase(Locale.ROOT).endsWith(".apk")) this else "$this.apk"
 
@@ -309,6 +372,8 @@ object AppUpdater {
         return "'${replace("'", "'\\''")}'"
     }
 }
+
+private val VERSION_NAME_REGEX = Regex("""\d+(?:\.\d+)+(?:-CI-[A-Za-z0-9]+)?""")
 
 enum class UpdateInstallMode {
     Interactive,
@@ -329,6 +394,7 @@ private enum class UpdatePackageKind {
 
 private data class UpdatePackage(
     val versionName: String,
+    val versionCode: Long? = null,
     val downloadUrl: String,
     val fileName: String,
     val kind: UpdatePackageKind,

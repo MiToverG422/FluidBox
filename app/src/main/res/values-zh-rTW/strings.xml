@@ -80,6 +80,8 @@
     <string name="feature_native_notify_icon_summary">啟用原生圖示樣式，此功能不能完全覆蓋，仍需要 App 適配</string>
     <string name="feature_native_notification_bubbles_title">原生通知氣泡</string>
     <string name="feature_native_notification_bubbles_summary">在框架層強制放行 Android 對話氣泡，僅限 ColorOS CN 使用，需要重啟系統</string>
+    <string name="feature_force_native_clipboard_overlay_title">原生剪貼簿</string>
+    <string name="feature_force_native_clipboard_overlay_summary">強制啟用左下角原生剪貼簿</string>
 
 
 <string name="feature_group_minus_one">負一屏</string>
@@ -196,6 +198,15 @@
     <string name="feature_status_mobile_type_hide_data_off_summary">關閉移動數據時隱藏狀態列圖標</string>
     <string name="feature_status_mobile_type_hide_wifi_title">隱藏 Wi-Fi 類型圖標</string>
     <string name="feature_status_mobile_type_hide_wifi_summary">隱藏 Wi-Fi 圖標旁邊的類型標识</string>
+    <string name="feature_group_control_center">控制中心</string>
+    <string name="feature_hide_qs_edit_title">隱藏編輯開關</string>
+    <string name="feature_hide_qs_edit_summary">隱藏控制中心右上角選單裡的編輯入口</string>
+    <string name="feature_hide_qs_settings_title">隱藏控制中心設定按鈕</string>
+    <string name="feature_hide_qs_settings_summary">隱藏控制中心跳轉系統設定的設定按鈕</string>
+    <string name="feature_hide_qs_top_carrier_title">隱藏頂部電信業者</string>
+    <string name="feature_hide_qs_top_carrier_summary">隱藏控制中心頂部電信業者文字</string>
+    <string name="feature_hide_qs_more_title">隱藏控制中心更多入口</string>
+    <string name="feature_hide_qs_more_summary">隱藏控制中心右上角圓形更多按鈕</string>
     <string name="feature_group_refresh_rate">更新率</string>
 
 

@@ -138,6 +138,10 @@ object SystemUiHooker {
         hookMobileTypeVisibility(classLoader)
         hookMobileIconSubIds(classLoader)
         hookMobileTypeStateRefresh(classLoader)
+        hookControlCenterMenuVisibility(classLoader)
+        hookControlCenterQuickEntranceVisibility(classLoader)
+        hookControlCenterTopCarrier(classLoader)
+        hookForceNativeClipboardOverlay(classLoader)
         if (LspConfig.isNativeNotifyIconEnabledXposed()) {
             hookSmallIconDecisions(classLoader)
             hookNotificationUtilsGrayscaleChecks(classLoader)
@@ -987,6 +991,237 @@ object SystemUiHooker {
                     "init=${dozeServiceMethods.size}, running=${runningMethods.size}, panoramic=${panoramicMethods.size}"
             )
         }
+    }
+
+    private fun hookControlCenterMenuVisibility(classLoader: ClassLoader?) {
+        val popupClasses = listOf(
+            "com.oplus.systemui.qs.widget.MoreButtonPopupWindow",
+            "com.oplus.systemui.plugins.qs.quickentrance.popupwindow.OplusQSMoreButtonPopupWindow"
+        ).mapNotNull { className ->
+            XposedHelpers.findClassIfExists(className, classLoader)
+        }
+        popupClasses.forEach { popupClass ->
+            popupClass.declaredMethods
+                .filter { method ->
+                    method.name == "initList\$1" ||
+                        method.name == "initList" ||
+                        method.name.startsWith("initList")
+                }
+                .forEach { method ->
+                    val key = "qs_more_menu_visibility|${method.declaringClass.name}|${method.name}"
+                    if (!addHookKeyIfAbsent(key)) return@forEach
+                    XposedBridge.hookMethod(method, object : XC_MethodHook() {
+                        override fun beforeHookedMethod(param: MethodHookParam) {
+                            applyControlCenterMenuVisibility(param.thisObject)
+                        }
+                    })
+                }
+            popupClass.declaredMethods
+                .filter { method -> method.name == "show" || method.name.startsWith("show") }
+                .forEach { method ->
+                    val key = "qs_more_menu_visibility|${method.declaringClass.name}|${method.name}|show|${method.parameterTypes.joinToString { it.name }}"
+                    if (!addHookKeyIfAbsent(key)) return@forEach
+                    XposedBridge.hookMethod(method, object : XC_MethodHook() {
+                        override fun beforeHookedMethod(param: MethodHookParam) {
+                            applyControlCenterMenuVisibility(param.thisObject)
+                            refreshControlCenterMenuList(param.thisObject)
+                        }
+                    })
+                }
+            val constructorKey = "qs_more_menu_visibility|${popupClass.name}|constructors"
+            if (addHookKeyIfAbsent(constructorKey)) {
+                XposedBridge.hookAllConstructors(popupClass, object : XC_MethodHook() {
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        applyControlCenterMenuVisibility(param.thisObject)
+                        refreshControlCenterMenuList(param.thisObject)
+                    }
+                })
+            }
+            log("SystemUI control center menu visibility hook: ${popupClass.name}")
+        }
+        val controllerClass = XposedHelpers.findClassIfExists(
+            "com.oplus.systemui.plugins.qs.quickentrance.popupwindow.OplusQSMoreButtonPopupWindowController",
+            classLoader
+        )
+        controllerClass?.declaredMethods
+            ?.filter { method -> method.name == "showEdit" || method.name == "showPopupWindow" }
+            ?.forEach { method ->
+                val key = "qs_more_menu_visibility|${method.declaringClass.name}|${method.name}|block"
+                if (!addHookKeyIfAbsent(key)) return@forEach
+                XposedBridge.hookMethod(method, object : XC_MethodHook() {
+                    override fun beforeHookedMethod(param: MethodHookParam) {
+                        if (
+                            method.name == "showEdit" &&
+                            LspConfig.isSystemUiHideQsEditEnabledXposed()
+                        ) {
+                            param.result = null
+                        }
+                        if (
+                            method.name == "showPopupWindow" &&
+                            LspConfig.isSystemUiHideQsMoreEnabledXposed()
+                        ) {
+                            param.result = null
+                        }
+                    }
+                })
+            }
+    }
+
+    private fun hookControlCenterQuickEntranceVisibility(classLoader: ClassLoader?) {
+        val componentClass = XposedHelpers.findClassIfExists(
+            "com.oplus.systemui.plugins.qs.quickentrance.OplusQSQuickEntranceComponent",
+            classLoader
+        ) ?: return
+        val constructorKey = "qs_quick_entrance_visibility|${componentClass.name}|constructors"
+        if (addHookKeyIfAbsent(constructorKey)) {
+            XposedBridge.hookAllConstructors(componentClass, object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    applyControlCenterQuickEntranceVisibility(param.thisObject)
+                }
+            })
+        }
+        componentClass.declaredMethods
+            .filter { method ->
+                method.name.startsWith("update") ||
+                    method.name == "onViewAttached" ||
+                    method.name == "refreshItemViewBackground"
+            }
+            .forEach { method ->
+                val key = "qs_quick_entrance_visibility|${method.declaringClass.name}|${method.name}|${method.parameterTypes.joinToString { it.name }}"
+                if (!addHookKeyIfAbsent(key)) return@forEach
+                XposedBridge.hookMethod(method, object : XC_MethodHook() {
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        applyControlCenterQuickEntranceVisibility(param.thisObject)
+                    }
+                })
+            }
+        log("SystemUI control center quick entrance visibility hook: ${componentClass.name}")
+    }
+
+    private fun hookForceNativeClipboardOverlay(classLoader: ClassLoader?) {
+        val featureOptionClass = XposedHelpers.findClassIfExists(
+            "com.oplusos.systemui.common.feature.FeatureOption",
+            classLoader
+        ) ?: return
+        val methods = featureOptionClass.declaredMethods.filter { method ->
+            method.name == "isExpRegion" &&
+                method.parameterTypes.isEmpty() &&
+                method.returnType == Boolean::class.javaPrimitiveType
+        }
+        methods.forEach { method ->
+            val key = "force_native_clipboard_overlay|${method.declaringClass.name}|${method.name}"
+            if (!addHookKeyIfAbsent(key)) return@forEach
+            XposedBridge.hookMethod(method, object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    if (
+                        LspConfig.isSystemUiForceNativeClipboardOverlayEnabledXposed() &&
+                        isClipboardPrimaryClipChangedCall()
+                    ) {
+                        param.result = true
+                    }
+                }
+            })
+        }
+        log("SystemUI force native clipboard overlay hook: ${methods.size}")
+    }
+
+    private fun isClipboardPrimaryClipChangedCall(): Boolean {
+        return Thread.currentThread().stackTrace.any { frame ->
+            frame.className == "com.android.systemui.clipboardoverlay.ClipboardListener" &&
+                frame.methodName == "onPrimaryClipChanged"
+        }
+    }
+
+    private fun applyControlCenterMenuVisibility(popupWindow: Any?) {
+        if (popupWindow == null) return
+        if (LspConfig.isSystemUiHideQsEditEnabledXposed()) {
+            setFieldViewGone(popupWindow, "editButton")
+        }
+        if (LspConfig.isSystemUiHideQsMoreEnabledXposed()) {
+            setFieldViewGone(popupWindow, "outSwitchView")
+            setFieldViewGone(popupWindow, "usersView")
+        }
+    }
+
+    private fun applyControlCenterQuickEntranceVisibility(component: Any?) {
+        if (component == null) return
+        if (LspConfig.isSystemUiHideQsEditEnabledXposed()) {
+            setFieldViewGone(component, "editBtn")
+            setFieldViewGone(component, "editBtnRedDot")
+        }
+        if (LspConfig.isSystemUiHideQsSettingsEnabledXposed()) {
+            setFieldViewGone(component, "settingsButton")
+            setFieldViewGone(component, "settingsButtonIcon")
+        }
+        if (LspConfig.isSystemUiHideQsMoreEnabledXposed()) {
+            setFieldViewGone(component, "moreBtn")
+            setFieldViewGone(component, "moreBtnIcon")
+            setFieldViewGone(component, "moreBtnRedDot")
+        }
+    }
+
+    private fun refreshControlCenterMenuList(popupWindow: Any?) {
+        if (popupWindow == null) return
+        runCatching {
+            XposedHelpers.callMethod(popupWindow, "initList")
+        }.recoverCatching {
+            XposedHelpers.callMethod(popupWindow, "initList\$1")
+        }
+    }
+
+    private fun hookControlCenterTopCarrier(classLoader: ClassLoader?) {
+        val carrierClass = XposedHelpers.findClassIfExists(
+            "com.oplus.systemui.qs.widget.OplusSecondCarrierText",
+            classLoader
+        ) ?: return
+        val constructorKey = "qs_top_carrier_visibility|${carrierClass.name}|constructors"
+        if (addHookKeyIfAbsent(constructorKey)) {
+            XposedBridge.hookAllConstructors(carrierClass, object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    hideControlCenterTopCarrier(param.thisObject)
+                }
+            })
+        }
+        val refreshMethodNames = setOf(
+            "onAttachedToWindow",
+            "onConfigurationChanged",
+            "onSizeChanged",
+            "onWindowFocusChanged",
+            "setMarqueeAllowedByPanel",
+            "updateTextSize\$1"
+        )
+        carrierClass.declaredMethods
+            .filter { method -> method.name in refreshMethodNames }
+            .forEach { method ->
+                val key = "qs_top_carrier_visibility|${method.declaringClass.name}|${method.name}|${method.parameterTypes.joinToString { it.name }}"
+                if (!addHookKeyIfAbsent(key)) return@forEach
+                XposedBridge.hookMethod(method, object : XC_MethodHook() {
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        hideControlCenterTopCarrier(param.thisObject)
+                    }
+                })
+            }
+        log("SystemUI control center top carrier hook: ${carrierClass.name}")
+    }
+
+    private fun hideControlCenterTopCarrier(target: Any?) {
+        if (!LspConfig.isSystemUiHideQsTopCarrierEnabledXposed()) return
+        (target as? View)?.let { view ->
+            view.visibility = View.GONE
+            view.alpha = 0f
+        }
+    }
+
+    private fun dpToPx(context: Context, dp: Float): Int {
+        return (context.resources.displayMetrics.density * dp).toInt()
+    }
+
+    private fun setFieldViewGone(target: Any, fieldName: String) {
+        val view = runCatching {
+            XposedHelpers.getObjectField(target, fieldName) as? View
+        }.getOrNull() ?: return
+        view.visibility = View.GONE
+        view.alpha = 0f
     }
 
     private fun hookReturnFalse(method: Method) {
