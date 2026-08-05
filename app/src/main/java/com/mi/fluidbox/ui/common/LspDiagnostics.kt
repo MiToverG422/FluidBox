@@ -1,9 +1,8 @@
-﻿package com.mi.fluidbox.ui.common
+package com.mi.fluidbox.ui.common
 
 import android.content.Context
 import com.mi.fluidbox.lsp.LspConfig
 import com.mi.fluidbox.lsp.LsposedScopeRequester
-import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -19,7 +18,7 @@ suspend fun appendLspDiagnosticsForFeedback(
     // Keep only the latest diagnostics snapshot so refresh replaces previous LSP diagnostics.
     AppLogStore.removeByTagPrefix("LSP")
     AppLogStore.i("LSP", "Collect diagnostics ($reason)")
-    val shellUidResult = Shell.cmd("id -u").exec()
+    val shellUidResult = ShellLogger.exec("LSP", "id -u")
     val shellUid = shellUidResult.out.firstOrNull()?.trim().orEmpty().ifBlank { "unknown" }
     AppLogStore.i("LSP", "Shell uid: $shellUid")
     AppLogStore.i(
@@ -31,13 +30,13 @@ suspend fun appendLspDiagnosticsForFeedback(
         "Native icon toggle (xposed readable): ${runCatching { LspConfig.isNativeNotifyIconEnabledXposed() }.getOrNull()}"
     )
 
-    val lsposedPkg = Shell.cmd("pm list packages org.lsposed.manager").exec()
+    val lsposedPkg = ShellLogger.exec("LSP", "pm list packages org.lsposed.manager")
     val hasLsposedManager = lsposedPkg.out.any { it.contains("org.lsposed.manager") }
     AppLogStore.i("LSP", "LSPosed manager installed: $hasLsposedManager")
     val lsposedSnapshot = runCatching { LsposedScopeRequester.snapshot(context) }.getOrNull()
-    val lsposedReady = lsposedSnapshot?.let { it.moduleEnabled && it.hasRequiredScopes } ?: false
+    val lsposedReady = lsposedSnapshot?.moduleEnabled ?: false
 
-    val systemUiPidResult = Shell.cmd("pidof com.android.systemui").exec()
+    val systemUiPidResult = ShellLogger.exec("LSP", "pidof com.android.systemui")
     val systemUiPid = systemUiPidResult.out.firstOrNull()?.trim().orEmpty()
     if (systemUiPid.isNotBlank()) {
         AppLogStore.i("LSP", "SystemUI pid: $systemUiPid")
@@ -83,7 +82,7 @@ private fun readRecentLogcatLines(requestedLines: Int): List<String> {
     )
 
     candidates.forEach { command ->
-        val result = Shell.cmd(command).exec()
+        val result = ShellLogger.exec("Logcat", command)
         if (result.isSuccess && result.out.isNotEmpty()) {
             return result.out.takeLast(safeRequested)
         }

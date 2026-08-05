@@ -1,4 +1,4 @@
-﻿package com.mi.fluidbox.ui.common
+package com.mi.fluidbox.ui.common
 
 import android.content.Context
 import android.content.res.Configuration
@@ -10,7 +10,9 @@ object AppLocale {
     const val LANGUAGE_EN = "en"
     const val LANGUAGE_ZH_CN = "zh-CN"
     const val LANGUAGE_ZH_HK = "zh-HK"
+    const val LANGUAGE_ZH_MO = "zh-MO"
     const val LANGUAGE_ZH_TW = "zh-TW"
+    const val LANGUAGE_YUE_HANT = "yue-Hant"
 
     private const val PREFS_NAME = "fluidbox_prefs"
     private const val KEY_APP_LANGUAGE = "app_language"
@@ -53,6 +55,8 @@ object AppLocale {
         LANGUAGE_EN,
         LANGUAGE_ZH_CN,
         LANGUAGE_ZH_HK,
-        LANGUAGE_ZH_TW
+        LANGUAGE_ZH_MO,
+        LANGUAGE_ZH_TW,
+        LANGUAGE_YUE_HANT
     )
 }

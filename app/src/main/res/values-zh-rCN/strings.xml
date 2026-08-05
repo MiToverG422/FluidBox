@@ -1,99 +1,61 @@
-﻿<resources>
+<resources>
     <string name="app_name">FluidBox</string>
-    <string name="xposed_description">FluidBox LSPosed 模块基础（原生通知图标 Hook）</string>
-    <string name="md3e_home_title">FluidBox</string>
+    <string name="xposed_description">一个 COUI 风格的 OPlus 系统自定义工具箱</string>
 
-    <string name="tab_home">首页</string>
+<string name="tab_home">首页</string>
     <string name="tab_features">功能</string>
-    <string name="tab_battery">电池</string>
-    <string name="tab_events">日志</string>
+
+<string name="tab_events">日志</string>
     <string name="tab_settings">设置</string>
-    <string name="tab_page_placeholder">%1$s 页面</string>
 
-    <string name="status_enabled">已启用</string>
-    <string name="status_activated">已激活</string>
-    <string name="status_inactive">未激活</string>
 
-    <string name="settings_hook_entry_title">FluidBox 设置</string>
-    <string name="settings_hook_entry_summary">在系统设置中直接开关 FluidBox 的 Xposed 功能。</string>
-    <string name="settings_hook_category_notification_icons">通知图标</string>
-    <string name="settings_hook_category_system_ui">系统界面</string>
-    <string name="settings_hook_category_features">功能开关</string>
-    <string name="settings_hook_category_actions">操作</string>
-    <string name="settings_hook_restart_systemui_title">重启 SystemUI</string>
-    <string name="settings_hook_restart_systemui_summary">通知图标或系统界面相关改动未立即生效时使用。</string>
+<string name="settings_hook_entry_title">FluidBox 设置</string>
+
+
+<string name="settings_hook_restart_systemui_title">重启 SystemUI</string>
+    <string name="settings_hook_restart_systemui_summary">通知图标或系统界面相关改动未立即生效时使用</string>
     <string name="settings_hook_restart_systemui_done">已请求重启 SystemUI</string>
-    <string name="settings_hook_restart_systemui_failed">重启 SystemUI 失败，请授予 Root 或手动重启。</string>
+    <string name="settings_hook_restart_systemui_failed">重启 SystemUI 失败，请授予 Root 或手动重启</string>
     <string name="settings_hook_open_failed">无法打开 FluidBox Hook 设置</string>
 
     <string name="info_version">版本</string>
     <string name="info_package_name">包名</string>
-    <string name="info_system_version">系统版本</string>
-    <string name="info_device_model">设备型号</string>
-    <string name="info_architecture">系统架构</string>
-    <string name="app_version_with_code">%1$s (%2$s)</string>
-    <string name="system_version_format">%1$s (API %2$d)</string>
-    <string name="common_unknown">未知</string>
-    <string name="home_dash_android_api_format">Android %1$s / API %2$d</string>
-    <string name="home_dash_battery_state_perfect">状态完美</string>
-    <string name="home_dash_battery_state_good">状态良好</string>
-    <string name="home_dash_battery_state_fair">状态一般</string>
-    <string name="home_dash_battery_state_low">状态偏低</string>
-    <string name="home_dash_battery_level_label">底层真实电量</string>
-    <string name="home_dash_battery_health_label">电池健康度</string>
-    <string name="home_dash_cycle_count_label">循环次数</string>
-    <string name="home_dash_design_capacity_label">设计容量</string>
-    <string name="home_dash_full_capacity_label">满充容量</string>
-    <string name="home_dash_current_capacity_label">当前容量</string>
 
-    <string name="section_personalization">个性化</string>
-    <string name="section_system_desktop">系统桌面</string>
+<string name="info_device_model">设备型号</string>
+
+
+<string name="home_dash_android_api_format">Android %1$s / API %2$d</string>
+
+
+<string name="section_system_desktop">系统桌面</string>
     <string name="section_lsp">系统界面</string>
     <string name="section_experimental">实验性功能</string>
-    <string name="section_other_settings">其他设置</string>
-    <string name="section_about">关于</string>
+
+<string name="section_about">关于</string>
 
     <string name="setting_theme_mode">主题模式</string>
-    <string name="setting_theme_mode_summary">选择界面外观</string>
-    <string name="setting_theme_settings">主题设定</string>
-    <string name="setting_theme_settings_summary">主题模式、取色与开关外观</string>
-    <string name="setting_search_placeholder">搜索设置项</string>
-    <string name="theme_mode_system">跟随系统</string>
+
+<string name="setting_theme_settings">设定</string>
+
+
+<string name="theme_mode_system">跟随系统</string>
     <string name="theme_mode_light">浅色模式</string>
     <string name="theme_mode_dark">深色模式</string>
-    <string name="setting_ui_style">界面风格</string>
-    <string name="setting_ui_style_summary">在 MD3E 与 COSX 之间切换</string>
-    <string name="ui_style_md3e">MD3E</string>
-    <string name="ui_style_cosx">COSX</string>
 
-    <string name="setting_enable_md3e">启用 MD3E 风格</string>
-    <string name="setting_enable_md3e_summary">更鲜明的形状、色彩层次和组件反馈</string>
-    <string name="setting_enable_md3e_miuix_summary">为接入 Google Material 3 Expressive 做准备</string>
 
-    <string name="setting_custom_monet">自定义莫奈取色</string>
-    <string name="setting_custom_monet_summary">启用自定义系统色彩</string>
-    <string name="setting_theme_color_with_name">主题色：%1$s</string>
-    <string name="monet_name_custom">自定义</string>
-
-    <string name="setting_predictive_back">预测返回手势</string>
-    <string name="setting_predictive_back_summary">启用 Android 预测返回体验</string>
-    <string name="setting_app_language">应用语言</string>
+<string name="setting_app_language">应用语言</string>
     <string name="setting_app_language_summary">选择此应用程序的显示语言</string>
     <string name="language_system">跟随系统</string>
     <string name="language_english">英语</string>
     <string name="language_simplified_chinese">简体中文</string>
     <string name="language_traditional_chinese_hk">繁体中文（香港）</string>
     <string name="language_traditional_chinese_tw">繁体中文（台湾）</string>
-    <string name="setting_switch_icons">开关图示</string>
-    <string name="setting_switch_icons_summary">显示开关上的勾与 X</string>
-    <string name="setting_show_logs">显示日志</string>
-    <string name="setting_show_logs_summary">在底栏中显示「日志」分页</string>
-    <string name="setting_show_battery">显示电池页</string>
-    <string name="setting_show_battery_summary">在底栏中显示「电池」分页</string>
-    <string name="setting_show_cn_special_features">显示中国大陆版特殊功能</string>
-    <string name="setting_show_cn_special_features_summary">显示仅适用于中国大陆版系统的功能入口</string>
+
+
+<string name="setting_show_cn_special_features">显示中国大陆版特殊功能</string>
+    <string name="setting_show_cn_special_features_summary">显示适用于 ColorOS CN 系统的功能入口</string>
     <string name="setting_show_global_special_features">显示国际版特殊功能</string>
-    <string name="setting_show_global_special_features_summary">显示仅适用于国际版系统的功能入口</string>
+    <string name="setting_show_global_special_features_summary">显示适用于 OxygenOS 和 ColorOS Global 系统的功能入口</string>
     <string name="section_restore_backup">恢复与备份</string>
     <string name="setting_export_config">导出配置</string>
     <string name="setting_export_config_summary">将当前应用配置保存到文件</string>
@@ -101,7 +63,7 @@
     <string name="setting_import_config_summary">从备份文件恢复应用配置</string>
     <string name="config_export_success">配置已导出：%1$s</string>
     <string name="config_export_failed">导出失败：%1$s</string>
-    <string name="config_import_success">配置已导入。</string>
+    <string name="config_import_success">配置已导入</string>
     <string name="config_import_failed">导入失败：%1$s</string>
     <string name="about_author_info_title">MiToverG</string>
     <string name="about_author_info_summary">作者</string>
@@ -109,221 +71,289 @@
     <string name="about_author_coolapk_summary">MiToverG422 的酷安主页</string>
     <string name="about_author_github_profile_title">GitHub 主页</string>
     <string name="about_author_github_profile_summary">MiToverG422 的 GitHub 主页</string>
-    <string name="about_github_title">GitHub</string>
-    <string name="about_github_summary">欢迎各位开发者与用户与我们共同 开发或提出建议!</string>
+    <string name="about_github_title">GitHub 仓库</string>
+    <string name="about_github_summary">查看源码、版本发布、问题反馈与开发进度</string>
     <string name="about_telegram_title">Telegram 频道</string>
-    <string name="about_telegram_summary">获取最新 CI 构建、更新动态与测试反馈，欢迎加入频道关注项目进展。</string>
+    <string name="about_telegram_summary">获取 CI 构建、更新动态与测试反馈</string>
 
     <string name="feature_native_notify_icon_title">原生通知图标</string>
-    <string name="feature_native_notify_icon_summary">启用原生图标样式，此功能并不能完全覆盖，需要 App 适配。切换后请重启系统界面和重启手机。</string>
+    <string name="feature_native_notify_icon_summary">启用原生图标样式，此功能并不能完全覆盖，需要 App 适配</string>
     <string name="feature_native_notification_bubbles_title">原生通知气泡</string>
-    <string name="feature_native_notification_bubbles_summary">在框架层强制放行安卓对话气泡，并显示被隐藏的系统设置入口。请用本身会发送气泡元数据的应用测试。切换后请重启手机。</string>
-    <string name="feature_notification_bubble_blur_title">通知气泡背景模糊</string>
-    <string name="feature_notification_bubble_blur_summary">自定义通知气泡背景模糊半径。</string>
-    <string name="feature_notification_bubble_blur_hint">提示：切换或调整后请重启系统界面，使新参数生效。</string>
-    <string name="feature_group_minus_one">负一屏</string>
+    <string name="feature_native_notification_bubbles_summary">在框架层强制放行安卓对话气泡，仅限 ColorOS CN 使用，需要重启系统</string>
+
+
+<string name="feature_group_minus_one">负一屏</string>
     <string name="feature_group_region">地区</string>
     <string name="feature_group_layout">布局</string>
     <string name="feature_group_recent_tasks">最近任务</string>
     <string name="feature_extreme_refresh_165_title">全局165Hz极速高刷</string>
-    <string name="feature_extreme_refresh_165_summary">启用全局165Hz高刷。走的系统策略，有效防止某些掉帧情况。需要在开发者模式打开“165HZ极速高刷”。</string>
+    <string name="feature_extreme_refresh_165_summary">启用全局165Hz高刷，走的系统策略，有效防止某些掉帧情况，需要在开发者模式打开“165HZ极速高刷”</string>
     <string name="feature_permission_monitor_title">恢复显示“禁止权限监控”</string>
-    <string name="feature_permission_monitor_summary">恢复显示开发者选项中的“禁止权限监控”(此选项在16.1之后被隐藏)。</string>
+    <string name="feature_permission_monitor_summary">恢复显示开发者选项中的“禁止权限监控”(此选项在16.1之后被隐藏，现改名“禁止系统优化”)</string>
+    <string name="feature_settings_force_google_title">强制显示 Google</string>
+    <string name="feature_settings_force_google_summary">强制显示系统设置底部的 Google 入口</string>
+    <string name="feature_group_settings_hidden_features">设置隐藏功能</string>
     <string name="feature_launcher_region_title">自定义桌面地区</string>
-    <string name="feature_launcher_region_summary">覆盖桌面读取的地区标识，用于切换地区相关入口。切换后请重启桌面。</string>
-    <string name="feature_launcher_region_off">关闭</string>
+
+<string name="feature_launcher_region_off">关闭</string>
     <string name="feature_launcher_region_cn">CN</string>
     <string name="feature_launcher_region_in">IN</string>
     <string name="feature_launcher_layout_unlock_title">解锁桌面布局</string>
-    <string name="feature_launcher_layout_unlock_summary">解除桌面布局限制。</string>
+    <string name="feature_launcher_layout_unlock_summary">解除桌面布局限制</string>
     <string name="feature_recent_task_radius_title">后台任务圆角</string>
-    <string name="feature_recent_task_radius_summary">自定义最近任务卡片大小。</string>
+    <string name="feature_recent_task_radius_summary">自定义最近任务卡片大小</string>
     <string name="feature_aod_enhance_title">息屏显示</string>
-    <string name="feature_aod_enhance_summary">启用息屏显示增强（亮度优化、全景常亮支持、单击唤醒调整）。</string>
-    <string name="feature_category_header">功能分类</string>
-    <string name="feature_category_desktop_summary">桌面与负一屏相关功能</string>
+    <string name="feature_aod_enhance_summary">启用息屏显示增强（亮度优化、全景常亮支持、单击唤醒调整）</string>
+
+<string name="feature_category_desktop_summary">桌面与负一屏相关功能</string>
     <string name="feature_category_system_ui_summary">系统界面相关的显示与行为调整</string>
     <string name="feature_category_settings_summary">系统设置显示与开发者选项相关调整</string>
     <string name="feature_category_aod_summary">息屏显示亮度与行为设置</string>
-    <string name="feature_category_experimental_summary">实验性功能，使用前请自行评估风险。</string>
-    <string name="feature_slider_current_dp">当前值：%1$ddp</string>
-    <string name="feature_slider_current_px">当前值：%1$dpx</string>
-    <string name="feature_slider_input_dp_hint">输入 dp 值</string>
-    <string name="feature_slider_input_px_hint">输入 px 值</string>
-    <string name="feature_recent_task_radius_hint">提示：调整后需要重启桌面或重启设备，使新参数生效。</string>
-    <string name="feature_aod_brightness_section">AOD亮度设置</string>
-    <string name="feature_aod_dark_brightness_current">熄屏前暗光环境AOD亮度：%1$d</string>
-    <string name="feature_aod_dark_brightness_hint">输入熄屏前暗光环境AOD亮度</string>
-    <string name="feature_aod_bright_brightness_current">熄屏前亮光环境AOD亮度：%1$d</string>
-    <string name="feature_aod_bright_brightness_hint">输入熄屏前亮光环境AOD亮度</string>
-    <string name="feature_aod_multiplier_current">熄屏时AOD自动亮度倍率：%1$s</string>
-    <string name="feature_aod_multiplier_hint">输入熄屏时AOD自动亮度倍率</string>
-    <string name="feature_aod_function_section">AOD功能设置</string>
-    <string name="feature_aod_panoramic_title">系统界面-全天全景AOD支持</string>
-    <string name="feature_aod_settings_switch_title">息屏-全天全景AOD开关</string>
-    <string name="feature_aod_single_click_block_title">AOD单击唤醒屏蔽</string>
-    <string name="feature_status_disabled_pending">已停用 - 待开发</string>
 
-    <string name="event_page_tool_title">负一屏自定义工具</string>
-    <string name="event_page_tool_summary">切换桌面左侧页面行为并自动刷新桌面。</string>
+<string name="feature_slider_current_dp">当前值：%1$ddp</string>
+
+
+<string name="feature_aod_dark_brightness_current">熄屏前暗光环境AOD亮度：%1$d</string>
+
+<string name="feature_aod_bright_brightness_current">熄屏前亮光环境AOD亮度：%1$d</string>
+
+<string name="feature_aod_multiplier_current">熄屏时AOD自动亮度倍率：%1$s</string>
+
+
+<string name="feature_aod_panoramic_title">系统界面 - 全天全景 AOD 支持</string>
+    <string name="feature_aod_settings_switch_title">息屏 - 全天全景 AOD 开关</string>
+    <string name="feature_aod_single_click_block_title">屏蔽 AOD 单击唤醒</string>
+
+<string name="event_page_tool_title">负一屏自定义工具</string>
+    <string name="event_page_tool_summary">切换桌面左侧页面行为，仅限 OxygenOS 和 ColorOS Global 使用</string>
     <string name="event_shelf_option">Shelf</string>
     <string name="event_disable_option">关闭</string>
     <string name="event_default_option">默认</string>
-    <string name="event_applying">正在应用...</string>
-    <string name="event_apply_success_shelf">Shelf</string>
-    <string name="event_apply_success_disabled">已关闭</string>
-    <string name="event_apply_success_default">已恢复默认</string>
-    <string name="event_apply_failed">应用失败：%1$s</string>
 
-    <string name="log_page_title">日志</string>
-    <string name="log_page_summary">查看运行日志、保存日志到本地，或分享日志用于排错。</string>
-    <string name="log_action_filter">过滤</string>
+
+<string name="log_action_filter">过滤</string>
     <string name="log_action_save">保存</string>
     <string name="log_action_share">分享</string>
-    <string name="log_action_copy">复制</string>
-    <string name="log_action_clear">清除</string>
-    <string name="log_empty">暂无日志。</string>
+
+<string name="log_action_clear">清除</string>
+    <string name="log_empty">暂无日志</string>
     <string name="log_save_success">已保存：%1$s</string>
     <string name="log_save_failed">保存失败：%1$s</string>
-    <string name="log_share_success">已打开分享面板。</string>
-    <string name="log_share_failed">分享失败：%1$s</string>
-    <string name="log_copy_success">日志已复制。</string>
-    <string name="log_clear_success">日志已清除。</string>
-    <string name="log_share_subject">FluidBox 日志</string>
-    <string name="root_access_title">Root 状态</string>
-    <string name="root_access_summary">检查是否已取得 Root 权限</string>
-    <string name="root_access_status_checking">检测中...</string>
-    <string name="root_access_status_granted">Root 已授权</string>
-    <string name="root_access_status_denied">Root 未授权</string>
-    <string name="root_access_status_error">Root 检测失败</string>
-    <string name="root_access_manager_version_format">Root 管理器版本：%1$s</string>
-    
-    <string name="lsp_status_title">LSPosed 状态</string>
-    <string name="lsp_status_ready">已就绪</string>
-    <string name="lsp_status_not_ready">未就绪</string>
-    <string name="lsp_status_missing_scope">缺失作用域</string>
-    <string name="lsp_status_scope_hint">可能还需要目标应用作用域</string>
-    <string name="action_refresh">刷新</string>
-    <string name="first_launch_root_dialog_title">需要 Root 权限</string>
-    <string name="first_launch_root_dialog_message">首次启动 App 必须授予 Root 权限后才可继续使用。</string>
-    <string name="first_launch_root_dialog_denied">当前仍未取得 Root 权限，请授权后继续。</string>
-    <string name="first_launch_root_dialog_both_not_ready">Root 权限与 LSPosed 模块/作用域均未就绪，请完成后重试。</string>
-    <string name="first_launch_root_dialog_confirm">检查并继续</string>
-    <string name="first_launch_root_dialog_requesting">请求中...</string>
-    <string name="first_launch_root_dialog_request_scope">申请 LSPosed 作用域</string>
-    <string name="first_launch_root_dialog_scope_opened">已打开 LSPosed。请启用本模块并选择作用域，返回后点击“检查并继续”。</string>
-    <string name="first_launch_root_dialog_scope_open_failed">无法打开 LSPosed 管理器，请手动打开并授予模块作用域。</string>
-    <string name="first_launch_root_dialog_exit">结束 App</string>
 
-    <string name="feature_double_power_title">按两下电源键</string>
-    <string name="feature_double_power_summary">按两下电源键相关功能</string>
-    <string name="feature_double_power_custom_launch_title">自定义启动应用</string>
-    <string name="feature_double_power_custom_launch_summary">设置按两下电源键时启动的应用。</string>
-    <string name="feature_double_power_package_label">套件名称</string>
-    <string name="feature_double_power_package_hint">com.finshell.wallet</string>
-    <string name="feature_double_power_activity_label">Activity 类名（可选）</string>
-    <string name="feature_double_power_activity_hint">留空时按套件名称启动应用</string>
-    <string name="feature_double_power_hint">不填写 Activity 时按套件名称启动应用。修改后请重启一遍作用域。</string>
-    <string name="feature_assistant_title">助手替换</string>
+
+<string name="log_copy_success">日志已复制</string>
+    <string name="log_clear_success">日志已清除</string>
+    <string name="log_share_subject">FluidBox 日志</string>
+
+
+<string name="lsp_status_missing_scope">缺失作用域</string>
+
+<string name="action_refresh">刷新</string>
+
+
+<string name="feature_assistant_title">助手替换</string>
     <string name="feature_assistant_summary">电源键与手势条助手替换</string>
     <string name="feature_assistant_power_title">电源键长按替换</string>
-    <string name="feature_assistant_power_summary">拦截长按电源键唤醒小布助手，并替换为Google Gemini助手。</string>
-    <string name="feature_assistant_power_mode_none">不替换</string>
-    <string name="feature_assistant_power_mode_default">Gemini</string>
-    <string name="feature_assistant_gesture_title">手势条长按替换</string>
-    <string name="feature_assistant_gesture_summary">拦截长按导航手势指示条唤醒小布识屏，并替换为Google Circle to Search。</string>
-    <string name="feature_oos_localizer_title">OPlus 本地化</string>
-    <string name="feature_oos_localizer_home_summary">支持应用的地区与语言环境伪装</string>
-    <string name="feature_oos_localizer_summary">此功能需要前置Magisk/KernelSU模块，将支持的应用伪装为CN与简体中文环境。切换后请重启系统。</string>
-    <string name="battery_notification_channel">电池实时资讯</string>
-    <string name="battery_notification_channel_summary">充电时显示功率、温度、电流与进度。</string>
-    <string name="battery_power_watts">%.2f W</string>
-    <string name="battery_temperature_celsius">%.1f °C</string>
-    <string name="battery_current_amps">%.2f A</string>
-    <string name="battery_voltage_volts">%.2f V</string>
-    <string name="battery_percent_value">%1$d%%</string>
-    <string name="battery_notification_summary_fallback">充电资讯</string>
-    <string name="battery_plugged_ac">电源供应器</string>
-    <string name="battery_plugged_usb">USB</string>
-    <string name="battery_plugged_wireless">无线充电</string>
-    <string name="battery_plugged_dock">底座</string>
-    <string name="battery_plugged_unknown">未知</string>
-    <string name="battery_status_charging">充电中</string>
-    <string name="battery_status_discharging">放电中</string>
-    <string name="battery_status_full">已充满</string>
-    <string name="battery_status_not_charging">未充电</string>
-    <string name="battery_level_percent">%1$d%%</string>
-    <string name="battery_metric_power">功率</string>
-    <string name="battery_metric_temperature">温度</string>
-    <string name="battery_metric_current">电流</string>
-    <string name="battery_metric_voltage">电压</string>
-    <string name="battery_setting_live_notification_title">充电时显示即时资讯</string>
-    <string name="battery_setting_live_notification_summary">充电时在即时通知显示功率、温度、电流与进度。</string>
-    <string name="battery_setting_keep_background_title">允许背景执行</string>
-    <string name="battery_setting_keep_background_summary">申请忽略电池最佳化，让 FluidBox 可在背景保持电池相关任务。</string>
-    <string name="battery_setting_dual_cell_title">双电芯模式</string>
-    <string name="battery_setting_dual_cell_summary">适用于电流按单电芯回报的机型，会将电流与功率按双电芯修正。</string>
-    <string name="battery_setting_series_battery_title">串联电池模式</string>
-    <string name="battery_setting_series_battery_summary">适用于串联电池设计，会使用双路电压合计计算功率。</string>
-    <string name="battery_setting_refresh_interval_title">资讯刷新时间</string>
-    <string name="battery_setting_refresh_interval_summary">选择电池页资讯的刷新间隔。</string>
-    <string name="battery_refresh_interval_seconds">%1$s 秒</string>
-    <string name="battery_metric_plugged">电源来源</string>
-    <string name="battery_metric_charging_protocol">充电协议</string>
-    <string name="battery_metric_health">健康状态</string>
-    <string name="battery_metric_soh">电池健康度 (battery_soh)</string>
-    <string name="battery_metric_cycle_count">循环次数</string>
-    <string name="battery_metric_technology">电池技术</string>
-    <string name="battery_metric_battery_type">电池类型</string>
-    <string name="battery_metric_remaining_capacity">当前剩余容量 (battery_rm)</string>
-    <string name="battery_capacity_mah">%1$d mAh</string>
-    <string name="battery_metric_full_charge_capacity">完全充电容量 (battery_fcc)</string>
-    <string name="battery_metric_qmax">Qmax (batt_qmax)</string>
-    <string name="battery_metric_charge_counter">充电计数</string>
-    <string name="battery_charge_counter_mah">%.0f mAh</string>
-    <string name="battery_metric_energy_counter">能量计数</string>
-    <string name="battery_energy_counter_wh">%.2f Wh</string>
-    <string name="battery_metric_bcc_current">BCC 电流</string>
-    <string name="battery_current_ma">%1$d mA</string>
-    <string name="battery_metric_bcc_voltage">BCC 电压</string>
-    <string name="battery_dual_voltage_mv">%1$d / %2$d mV</string>
-    <string name="battery_voltage_mv">%1$d mV</string>
-    <string name="battery_metric_under_voltage">截止电压 (vbat_uv)</string>
-    <string name="battery_metric_manufacture_date">生产日期</string>
-    <string name="battery_metric_serial_number">序号</string>
-    <string name="battery_oplus_root_required">需要 Root 权限才能读取 OPlus 电池节点。</string>
-    <string name="battery_protocol_pps">PPS 充电</string>
-    <string name="battery_protocol_supervooc">SUPERVOOC</string>
-    <string name="battery_protocol_vooc">VOOC</string>
-    <string name="battery_protocol_qc">QC 充电</string>
-    <string name="battery_protocol_pd">PD 充电</string>
-    <string name="battery_protocol_standard">普通充电</string>
-    <string name="battery_protocol_unknown_code">未知协议 (%1$d)</string>
-    <string name="battery_protocol_with_power">%1$s · %2$s</string>
-    <string name="battery_health_good">良好</string>
-    <string name="battery_health_overheat">过热</string>
-    <string name="battery_health_dead">损坏</string>
-    <string name="battery_health_over_voltage">过压</string>
-    <string name="battery_health_failure">故障</string>
-    <string name="battery_health_cold">过冷</string>
+    <string name="feature_assistant_power_summary">拦截长按电源键唤醒小布助手，并替换为 Google Gemini 助手，仅限ColorOS CN使用</string>
 
-    <string name="monet_name_sakura">樱花色</string>
-    <string name="monet_name_red">红色</string>
-    <string name="monet_name_pink">粉色</string>
-    <string name="monet_name_purple">紫色</string>
-    <string name="monet_name_deep_purple">深紫色</string>
-    <string name="monet_name_indigo">靛蓝色</string>
-    <string name="monet_name_blue">蓝色</string>
-    <string name="monet_name_light_blue">浅蓝色</string>
-    <string name="monet_name_cyan">青色</string>
-    <string name="monet_name_teal">蓝绿色</string>
-    <string name="monet_name_green">绿色</string>
-    <string name="monet_name_light_green">浅绿色</string>
-    <string name="monet_name_lime">青柠色</string>
-    <string name="monet_name_yellow">黄色</string>
-    <string name="monet_name_amber">琥珀色</string>
-    <string name="monet_name_orange">橙色</string>
-    <string name="monet_name_deep_orange">深橙色</string>
-    <string name="monet_name_brown">啡色</string>
-    <string name="monet_name_blue_grey">蓝灰色</string>
+
+<string name="feature_assistant_gesture_title">手势条长按替换</string>
+    <string name="feature_assistant_gesture_summary">拦截长按导航手势指示条唤醒小布识屏，并替换为 Google Circle to Search，仅限ColorOS CN使用</string>
+    <string name="feature_oos_localizer_title">Global 本地化</string>
+    <string name="feature_oos_localizer_home_summary">仅限OxygenOS和ColorOS Global使用</string>
+    <string name="feature_oos_localizer_summary">此功能需要前置Magisk/KernelSU模块，将支持的应用伪装为CN与简体中文环境，切换后请重启系统</string>
+
+
+<string name="tab_refresh_rate">刷新率</string>
+    <string name="theme_mode_monet_system">莫奈跟随系统</string>
+    <string name="theme_mode_monet_light">莫奈浅色</string>
+    <string name="theme_mode_monet_dark">莫奈深色</string>
+    <string name="setting_theme_key_color">主题种子色</string>
+    <string name="setting_theme_palette_style">调色板风格</string>
+    <string name="setting_theme_color_spec">颜色规范</string>
+    <string name="theme_key_color_default">默认</string>
+    <string name="theme_key_color_blue">蓝色</string>
+    <string name="theme_key_color_green">绿色</string>
+    <string name="theme_key_color_purple">紫色</string>
+    <string name="theme_key_color_yellow">黄色</string>
+    <string name="theme_key_color_orange">橙色</string>
+    <string name="theme_key_color_pink">粉色</string>
+    <string name="theme_key_color_teal">青色</string>
+    <string name="setting_blur_effect">启用模糊效果</string>
+    <string name="setting_pop_follows_swipe_edge">返回方向跟随滑动边缘</string>
+    <string name="setting_pop_follows_swipe_edge_summary">返回动画方向跟随手指滑入的边缘</string>
+    <string name="settings_section_other">其他</string>
+    <string name="setting_developer_options">开发者选项</string>
+    <string name="setting_show_fps_monitor">显示 FPS 监视器</string>
+    <string name="setting_liquid_glass_bottom_bar">LiquidGlass 底栏</string>
+    <string name="setting_liquid_glass_bottom_bar_summary">使用 Apple 风格的 LiquidGlass 底栏，需要Android13+</string>
+    <string name="setting_one_china_principle">一个中国原则</string>
+    <string name="setting_one_china_principle_summary">将台湾地区相关文本和旗帜替换为符合一个中国原则的版本</string>
+    <string name="feature_group_beautify">美化</string>
+    <string name="feature_status_mobile_type_title">移动网络信号图标</string>
+    <string name="feature_status_mobile_type_summary">修改 5G 图标的位置与隐藏逻辑</string>
+    <string name="feature_status_mobile_type_hide_data_off_title">移动数据关闭时隐藏</string>
+    <string name="feature_status_mobile_type_hide_data_off_summary">移动数据关闭时隐藏状态栏移动网络类型图标</string>
+    <string name="feature_status_mobile_type_hide_wifi_title">Wi-Fi 连接时隐藏</string>
+    <string name="feature_status_mobile_type_hide_wifi_summary">连接 Wi-Fi 时隐藏状态栏移动网络类型图标</string>
+    <string name="feature_group_refresh_rate">刷新率</string>
+
+
+<string name="refresh_rate_auto_start">开机自动应用</string>
+    <string name="refresh_rate_show_refresh_rate">显示刷新频率</string>
+
+
+<string name="refresh_rate_restore_default">恢复默认刷新率</string>
+    <string name="refresh_rate_restore_success">已恢复默认刷新率</string>
+    <string name="refresh_rate_restore_failed">恢复失败</string>
+    <string name="refresh_rate_apply_failed">应用失败</string>
+
+<string name="refresh_rate_no_modes">未找到支持的刷新率</string>
+
+<string name="refresh_rate_table_id">ID</string>
+    <string name="refresh_rate_table_resolution">分辨率</string>
+    <string name="refresh_rate_table_refresh_rate">刷新率</string>
+    <string name="refresh_rate_resolution_format">%1$d x %2$d</string>
+    <string name="feature_group_native">原生</string>
+    <string name="feature_group_developer_options">开发者选项</string>
+    <string name="feature_aod_enhance_toggle_title">息屏显示增强</string>
+    <string name="feature_restart_scope_action">重启作用域</string>
+    <string name="feature_restart_scope_done">已请求重启作用域</string>
+    <string name="feature_restart_scope_failed">重启作用域失败，请授予 Root 或手动重启</string>
+    <string name="feature_restart_scope_unsupported">此页面没有可重启的作用域</string>
+    <string name="feature_restart_scope_confirm_title">是否重启 %1$s 作用域</string>
+    <string name="feature_restart_scope_confirm_summary">将强制停止相关应用，使模块配置重新加载</string>
+    <string name="feature_restart_scope_confirm_cancel">取消</string>
+    <string name="feature_restart_scope_confirm_action">重启</string>
+
+<string name="feature_oos_localizer_master_switch">总开关</string>
+    <string name="feature_oos_localizer_region_title">地区</string>
+    <string name="feature_oos_localizer_locale_title">语言环境</string>
+    <string name="feature_oos_localizer_model_title">设备型号</string>
+
+<string name="feature_oos_localizer_group_properties">自定义属性</string>
+
+<string name="feature_oos_localizer_group_scope">自定义作用域</string>
+    <string name="feature_oos_localizer_config_title">配置模式</string>
+    <string name="feature_oos_localizer_config_default">默认配置</string>
+    <string name="feature_oos_localizer_config_default_summary">使用内置的默认配置，建议使用自定义配置（配置型号为PMA120，伪装CN区域和简体中文环境，且作用域无法修改）</string>
+    <string name="feature_oos_localizer_config_custom">自定义配置</string>
+    <string name="feature_oos_localizer_config_custom_summary">使用以下自定义的规则参数及选定作用域进行伪装</string>
+    <string name="feature_oos_localizer_feature_properties">系统属性伪装</string>
+    <string name="feature_oos_localizer_feature_region">地区伪装</string>
+    <string name="feature_oos_localizer_feature_locale">语言环境伪装</string>
+    <string name="feature_oos_localizer_feature_build_model">设备型号伪装</string>
+    <string name="feature_oos_localizer_feature_app_features">Feature 伪装</string>
+    <string name="feature_oos_localizer_risk_title">高风险功能提醒</string>
+    <string name="feature_oos_localizer_risk_summary">这些规则会修改目标应用读取到的系统属性和 Feature 标记，错误参数可能导致应用崩溃、行为异常、无法开机或数据丢失，因自定义配置造成的任何问题作者概不负责，请确认风险后再保存</string>
+    <string name="feature_oos_localizer_scope_notice_title">作用域声明</string>
+    <string name="feature_oos_localizer_scope_notice_summary">自定义作用域目前仅支持列表内的包名，暂时不能手动自定义其他包名</string>
+    <string name="feature_oos_localizer_action_reset">重置</string>
+    <string name="feature_oos_localizer_action_save">保存</string>
+    <string name="feature_oos_localizer_reset_success">自定义内容已重置</string>
+    <string name="feature_oos_localizer_save_success">自定义内容已保存</string>
+
+<string name="about_codex_author_summary">开发协助</string>
+    <string name="about_codex_author_title">Codex</string>
+    <string name="about_contributor_colorlaris_summary">GitHub@Colorlaris\n哔哩哔哩@Colorlaris</string>
+    <string name="about_contributor_colorlaris_title">Colorlaris</string>
+    <string name="about_contributors_title">贡献人员</string>
+    <string name="about_description">一个 COUI 风格的 OPlus 系统自定义工具箱</string>
+    <string name="about_detail_build_time">构建时间</string>
+    <string name="about_detail_build_timestamp">构建时间戳</string>
+    <string name="about_detail_yukihookapi_version">YukiHookAPI 版本</string>
+    <string name="about_reference_androidx_summary">Android 官方扩展库</string>
+    <string name="about_reference_androidx_title">AndroidX</string>
+    <string name="about_reference_androidx_palette_summary">Android</string>
+    <string name="about_reference_androidx_palette_title">AndroidX Palette</string>
+    <string name="about_reference_android_gradle_plugin_summary">Android</string>
+    <string name="about_reference_android_gradle_plugin_title">Android Gradle Plugin</string>
+    <string name="about_reference_coui_summary">suqi8</string>
+    <string name="about_reference_coui_title">COUI</string>
+    <string name="about_reference_espresso_summary">Android</string>
+    <string name="about_reference_espresso_title">Espresso</string>
+    <string name="about_reference_gaze_capsule_summary">MochaRealm</string>
+    <string name="about_reference_gaze_capsule_title">Gaze Capsule</string>
+    <string name="about_reference_hidden_api_bypass_summary">LSPosed</string>
+    <string name="about_reference_hidden_api_bypass_title">AndroidHiddenApiBypass</string>
+    <string name="about_reference_jetpack_compose_summary">AndroidX</string>
+    <string name="about_reference_jetpack_compose_title">Jetpack Compose</string>
+    <string name="about_reference_junit_summary">JUnit Team</string>
+    <string name="about_reference_junit_title">JUnit</string>
+    <string name="about_reference_kernelsu_summary">KOWX712</string>
+    <string name="about_reference_kernelsu_title">KernelSU</string>
+    <string name="about_reference_kotlin_summary">JetBrains</string>
+    <string name="about_reference_kotlin_title">Kotlin</string>
+    <string name="about_reference_ksp_summary">Android</string>
+    <string name="about_reference_ksp_title">Kotlin Symbol Processing</string>
+    <string name="about_reference_libsu_summary">topjohnwu</string>
+    <string name="about_reference_libsu_title">libsu</string>
+    <string name="about_reference_lsposed_summary">LSPosed</string>
+    <string name="about_reference_lsposed_title">LSPosed</string>
+    <string name="about_reference_material_icons_summary">Google</string>
+    <string name="about_reference_material_icons_title">Material Icons</string>
+    <string name="about_reference_miuix_summary">compose-miuix-ui</string>
+    <string name="about_reference_miuix_title">MIUIX</string>
+    <string name="about_reference_oshin_summary">suqi8</string>
+    <string name="about_reference_oshin_title">OShin</string>
+    <string name="about_reference_shizuku_summary">RikkaApps</string>
+    <string name="about_reference_shizuku_title">Shizuku</string>
+    <string name="about_reference_xposed_api_summary">rovo89</string>
+    <string name="about_reference_xposed_api_title">XposedBridge API</string>
+    <string name="about_reference_yukihookapi_summary">HighCapable</string>
+    <string name="about_reference_yukihookapi_title">YukiHookAPI</string>
+    <string name="about_references_open_source_section">开源项目</string>
+    <string name="about_references_title">引用内容</string>
+    <string name="about_update_channel_title">更新通道</string>
+    <string name="about_version">版本：%1$s</string>
+    <string name="home_info_android_api">Android / API</string>
+    <string name="home_info_system_architecture">系统架构</string>
+    <string name="home_info_system_fingerprint">系统指纹</string>
+    <string name="home_info_kernel_version">内核版本</string>
+    <string name="home_info_region">国家 / 地区</string>
+    <string name="home_info_root">Root 状态</string>
+    <string name="home_info_system_version">系统版本</string>
+    <string name="home_info_unknown">未知</string>
+    <string name="home_status_lsp">LSPosed 状态</string>
+    <string name="home_status_root_missing">未授予 Root 权限</string>
+
+
+<string name="language_traditional_chinese_cantonese">繁体中文（粤语）</string>
+    <string name="language_traditional_chinese_mo">繁体中文（澳门）</string>
+
+<string name="log_level_debug">调试</string>
+    <string name="log_level_error">错误</string>
+    <string name="log_level_info">信息</string>
+    <string name="log_level_warn">警告</string>
+    <string name="log_search_placeholder">搜索日志</string>
+    <string name="lsp_status_module_disabled">未在 LSPosed 启用模块</string>
+    <string name="setting_haptic_feedback">触控反馈Plus</string>
+    <string name="setting_haptic_feedback_plus">ColorOS式震动</string>
+    <string name="setting_haptic_feedback_plus_summary">根据ColorOS系统个性化逻辑的制作的震动反馈</string>
+    <string name="setting_auto_silent_update">自动静默更新</string>
+    <string name="setting_auto_silent_update_summary">在后台自动检查并下载最新版本，下载完成后静默安装</string>
+    <string name="setting_software_update">软件更新</string>
+
+
+<string name="settings_section_display">显示</string>
+    <string name="settings_section_haptics">触觉</string>
+
+
+<string name="update_channel_github_ci">GitHub CI</string>
+    <string name="update_channel_github_releases">GitHub Releases</string>
+    <string name="update_checking">正在检查更新</string>
+    <string name="update_failed">获取更新失败</string>
+    <string name="update_install_permission_required">请允许安装未知应用后再检查</string>
+    <string name="update_install_started">正在安装 %1$s</string>
+    <string name="update_silent_install_finished">已安装 %1$s</string>
+    <string name="update_no_update">已是最新版本</string>
+    <string name="software_update_auto_settings">更新设置</string>
+    <string name="software_update_release_notes">查看更新说明</string>
+    <string name="software_update_release_notes_title">更新说明</string>
+    <string name="software_update_release_notes_empty">当前版本暂无更新说明。</string>
+    <string name="software_update_notice_title">注意事项</string>
+    <string name="software_update_notice_body">1. 在使用过程中遇到任何问题可通过 TG 群组进行反馈和咨询。\n2. 下载更新时请保持网络稳定,安装过程中请尽量不要强制关闭应用。\n3.本页展示的界面内容仅做功能展示,不同设备、 版本、区域可能存在差异,请以实际版本功能及界面为准。</string>
+    <string name="software_update_notice_more">查看更多内容和参与讨论。</string>
+    <string name="software_update_notice_community">前往 TG 群组</string>
+    <string name="software_update_version_title">软件版本</string>
 </resources>

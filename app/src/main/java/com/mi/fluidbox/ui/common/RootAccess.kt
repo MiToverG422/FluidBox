@@ -1,4 +1,4 @@
-﻿package com.mi.fluidbox.ui.common
+package com.mi.fluidbox.ui.common
 
 import android.content.Context
 import com.topjohnwu.superuser.Shell
@@ -118,6 +118,11 @@ data class SecureSettingApplyResult(
     val detail: String? = null
 )
 
+data class ScopeRestartResult(
+    val success: Boolean,
+    val detail: String? = null
+)
+
 private data class FreshSuResult(
     val isSuccess: Boolean,
     val out: List<String> = emptyList(),
@@ -125,11 +130,13 @@ private data class FreshSuResult(
 )
 
 private fun runFreshSu(command: String, timeoutSeconds: Long = 15): FreshSuResult {
+    AppLogStore.d("Shell", "[RootAccess] su -c ${command.take(240)}")
     return runCatching {
         val process = ProcessBuilder("su", "-c", command).start()
         val finished = process.waitFor(timeoutSeconds, TimeUnit.SECONDS)
         if (!finished) {
             process.destroyForcibly()
+            AppLogStore.w("Shell", "[RootAccess] su timed out")
             return FreshSuResult(
                 isSuccess = false,
                 err = listOf("su timed out")
@@ -137,12 +144,24 @@ private fun runFreshSu(command: String, timeoutSeconds: Long = 15): FreshSuResul
         }
         val stdout = process.inputStream.bufferedReader().readText().lines().filter { it.isNotBlank() }
         val stderr = process.errorStream.bufferedReader().readText().lines().filter { it.isNotBlank() }
+        val success = process.exitValue() == 0
+        AppLogStore.i(
+            "Shell",
+            "[RootAccess] success=$success, out=${stdout.size}, err=${stderr.size}"
+        )
+        stdout.take(3).forEach { line ->
+            AppLogStore.d("ShellOut", "[RootAccess] ${line.take(240)}")
+        }
+        stderr.take(5).forEach { line ->
+            AppLogStore.w("ShellErr", "[RootAccess] ${line.take(240)}")
+        }
         FreshSuResult(
-            isSuccess = process.exitValue() == 0,
+            isSuccess = success,
             out = stdout,
             err = stderr
         )
     }.getOrElse { throwable ->
+        AppLogStore.e("Shell", "[RootAccess] exception: ${throwable.message.orEmpty()}")
         FreshSuResult(
             isSuccess = false,
             err = listOfNotNull(throwable.message)
@@ -174,7 +193,7 @@ private fun closeCachedShell(reason: String) {
 
 private fun detectRootManagerVersion(): String? {
     fun firstLineOf(command: String): String? {
-        val result = Shell.cmd(command).exec()
+        val result = ShellLogger.exec("RootAccess", command)
         return (result.out.firstOrNull { it.isNotBlank() }
             ?: result.err.firstOrNull { it.isNotBlank() })
             ?.trim()
@@ -214,10 +233,11 @@ suspend fun applyAssistantScreenOption(option: AssistantScreenOption): Assistant
         }
 
         runCatching {
-            val writeResult = Shell.cmd(
+            val writeResult = ShellLogger.exec(
+                "DesktopAssistant",
                 "settings put secure assistant_screen_type $assistantType",
                 "settings put secure assistant_screen_type_left_enable $leftEnable"
-            ).exec()
+            )
 
             if (!writeResult.isSuccess) {
                 val reason = writeResult.err.firstOrNull { it.isNotBlank() }
@@ -230,8 +250,6 @@ suspend fun applyAssistantScreenOption(option: AssistantScreenOption): Assistant
                 )
             }
 
-            // Refresh launcher to apply changes. Ignore force-stop failure to keep the main action successful.
-            Shell.cmd("am force-stop com.android.launcher").exec()
             AppLogStore.i("DesktopAssistant", "Apply succeeded")
 
             AssistantScreenApplyResult(success = true)
@@ -244,11 +262,61 @@ suspend fun applyAssistantScreenOption(option: AssistantScreenOption): Assistant
         }
     }
 
+suspend fun restartScopePackages(packages: List<String>): ScopeRestartResult =
+    withContext(Dispatchers.IO) {
+        val targets = packages.distinct().filter { it.isNotBlank() }
+        if (targets.isEmpty()) {
+            return@withContext ScopeRestartResult(success = false, detail = "No restartable scope")
+        }
+
+        runCatching {
+            val failures = targets.mapNotNull { packageName ->
+                val result = if (packageName == "com.android.systemui") {
+                    restartSystemUiScope()
+                } else {
+                    ShellLogger.exec("ScopeRestart", "am force-stop $packageName")
+                }
+                if (result.isSuccess) {
+                    null
+                } else {
+                    packageName to (
+                        result.err.firstOrNull { it.isNotBlank() }
+                            ?: result.out.firstOrNull { it.isNotBlank() }
+                            ?: "force-stop command failed"
+                        )
+                }
+            }
+            if (failures.isEmpty()) {
+                AppLogStore.i("ScopeRestart", "Restart requested: ${targets.joinToString()}")
+                ScopeRestartResult(success = true)
+            } else {
+                val reason = failures.joinToString { (packageName, reason) -> "$packageName: $reason" }
+                AppLogStore.e("ScopeRestart", "Restart failed: $reason")
+                ScopeRestartResult(success = false, detail = reason)
+            }
+        }.getOrElse { throwable ->
+            AppLogStore.e("ScopeRestart", "Restart exception: ${throwable.message.orEmpty()}")
+            ScopeRestartResult(success = false, detail = throwable.message)
+        }
+    }
+
+private fun restartSystemUiScope(): Shell.Result {
+    val killResult = ShellLogger.exec("ScopeRestart", "pkill -f com.android.systemui")
+    return if (killResult.isSuccess) {
+        killResult
+    } else {
+        ShellLogger.exec("ScopeRestart", "am force-stop com.android.systemui")
+    }
+}
+
 suspend fun queryAssistantScreenOption(): AssistantScreenOption =
     withContext(Dispatchers.IO) {
         runCatching {
-            val typeResult = Shell.cmd("settings get secure assistant_screen_type").exec()
-            val leftResult = Shell.cmd("settings get secure assistant_screen_type_left_enable").exec()
+            val typeResult = ShellLogger.exec("DesktopAssistant", "settings get secure assistant_screen_type")
+            val leftResult = ShellLogger.exec(
+                "DesktopAssistant",
+                "settings get secure assistant_screen_type_left_enable"
+            )
 
             val rawType = typeResult.out.firstOrNull()?.trim().orEmpty()
             val rawLeft = leftResult.out.firstOrNull()?.trim().orEmpty()
@@ -273,7 +341,7 @@ suspend fun queryAssistantScreenOption(): AssistantScreenOption =
 suspend fun queryPermissionMonitorVisibility(): Boolean =
     withContext(Dispatchers.IO) {
         runCatching {
-            val result = Shell.cmd("settings get secure system_opt_enable").exec()
+            val result = ShellLogger.exec("PermissionMonitor", "settings get secure system_opt_enable")
             result.out.firstOrNull()?.trim() == "1"
         }.getOrElse { throwable ->
             AppLogStore.w("PermissionMonitor", "Read failed: ${throwable.message.orEmpty()}")
@@ -291,7 +359,7 @@ suspend fun applyPermissionMonitorVisibility(enabled: Boolean): SecureSettingApp
         AppLogStore.i("PermissionMonitor", "Apply visibility: $enabled")
 
         runCatching {
-            val result = Shell.cmd(command).exec()
+            val result = ShellLogger.exec("PermissionMonitor", command)
             if (result.isSuccess) {
                 SecureSettingApplyResult(success = true)
             } else {
@@ -310,7 +378,7 @@ suspend fun applyPermissionMonitorVisibility(enabled: Boolean): SecureSettingApp
 suspend fun queryLauncherLayoutUnlocked(): Boolean =
     withContext(Dispatchers.IO) {
         runCatching {
-            val result = Shell.cmd("settings get global useOldLayout").exec()
+            val result = ShellLogger.exec("LauncherLayout", "settings get global useOldLayout")
             result.out.firstOrNull()?.trim() == "1"
         }.getOrElse { throwable ->
             AppLogStore.w("LauncherLayout", "Read failed: ${throwable.message.orEmpty()}")
@@ -328,7 +396,7 @@ suspend fun applyLauncherLayoutUnlocked(enabled: Boolean): SecureSettingApplyRes
         AppLogStore.i("LauncherLayout", "Apply unlocked layout: $enabled")
 
         runCatching {
-            val result = Shell.cmd(command).exec()
+            val result = ShellLogger.exec("LauncherLayout", command)
             if (result.isSuccess) {
                 SecureSettingApplyResult(success = true)
             } else {

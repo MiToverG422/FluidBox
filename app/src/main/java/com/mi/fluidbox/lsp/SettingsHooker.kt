@@ -1,4 +1,4 @@
-﻿package com.mi.fluidbox.lsp
+package com.mi.fluidbox.lsp
 
 import android.content.ComponentName
 import android.content.Context
@@ -27,8 +27,24 @@ object SettingsHooker {
         if (!hookedLoaders.add(System.identityHashCode(classLoader))) return
 
         hookConfigureNotificationRedirect(classLoader)
+        hookForceGoogleEntry(classLoader)
         hookPreferenceFragment(classLoader)
         hookDashboardFragments(classLoader)
+    }
+
+    private fun hookForceGoogleEntry(classLoader: ClassLoader) {
+        val hookClass = XposedHelpers.findClassIfExists(
+            "com.oplus.settings.feature.homepage.controller.GooglePreferenceController",
+            classLoader
+        ) ?: return
+        runCatching {
+            XposedBridge.hookAllMethods(hookClass, "getAvailabilityStatus", object : XC_MethodHook() {
+                override fun beforeHookedMethod(param: MethodHookParam) {
+                    if (!LspConfig.isSettingsForceGoogleEntryEnabledXposed()) return
+                    param.result = 0
+                }
+            })
+        }.onFailure { log("hook GooglePreferenceController.getAvailabilityStatus failed", it) }
     }
 
     private fun hookConfigureNotificationRedirect(classLoader: ClassLoader) {
@@ -88,6 +104,7 @@ object SettingsHooker {
     private fun handleFragment(fragment: Any?, classLoader: ClassLoader) {
         if (fragment == null) return
         val context = getContext(fragment) ?: return
+        HookLog.bindContext(context)
         if (isHookSettingsScreen(fragment)) {
             buildHookSettingsScreen(fragment, context, classLoader)
         } else {
@@ -225,7 +242,6 @@ object SettingsHooker {
 
         val featureGroup = addCategory(screen, context, categoryClass, categoryLayout, categoryMarginType) ?: screen
         val featureRows = listOfNotNull(
-            addSwitch(featureGroup, context, classLoader, switchClass, switchLayout, switchWidgetLayout, moduleContext.getText(R.string.feature_double_power_custom_launch_title), moduleContext.getText(R.string.feature_double_power_custom_launch_summary), Toggle.DOUBLE_POWER_CUSTOM),
             addSwitch(featureGroup, context, classLoader, switchClass, switchLayout, switchWidgetLayout, moduleContext.getText(R.string.feature_oos_localizer_title), moduleContext.getText(R.string.feature_oos_localizer_summary), Toggle.OOS_LOCALIZER)
         )
         applyUnifiedSectionStyle(featureRows)
@@ -428,6 +444,7 @@ object SettingsHooker {
                 Runtime.getRuntime().exec(arrayOf("su", "-c", command)).waitFor() == 0
             }.getOrDefault(false)
         }
+        log("Restart SystemUI by shell success=$success")
         val message = if (success) {
             R.string.settings_hook_restart_systemui_done
         } else {
@@ -476,6 +493,10 @@ object SettingsHooker {
                 add("settings put global ${toggle.settingsKey} $value")
             }.joinToString("; ")
             Runtime.getRuntime().exec(arrayOf("su", "-c", commands)).waitFor()
+        }.onSuccess {
+            log("write ${toggle.settingsKey}=$value by shell")
+        }.onFailure {
+            log("write ${toggle.settingsKey} shell failed", it)
         }
     }
 
@@ -633,7 +654,7 @@ object SettingsHooker {
     }
 
     private fun log(message: String, throwable: Throwable? = null) {
-        XposedBridge.log("FluidBox SettingsHooker: $message${throwable?.let { "\n${it.stackTraceToString()}" } ?: ""}")
+        HookLog.i("SettingsHooker", message, throwable)
     }
 
     private enum class Toggle(
@@ -646,7 +667,6 @@ object SettingsHooker {
         EXTREME_REFRESH("oost_extreme_refresh_165", false, "persist.sys.oost.extreme_refresh_165", "oost.extreme_refresh_165"),
         NATIVE_NOTIFICATION_BUBBLES("oost_native_notification_bubbles", false, "persist.sys.oost.native_notification_bubbles", "oost.native_notification_bubbles"),
         AOD_ENHANCE("oost_aod_enhance", false, "persist.sys.oost.aod_enhance", "oost.aod_enhance"),
-        OOS_LOCALIZER("oost_oos_localizer", false, "persist.sys.oost.oos_localizer", "oost.oos_localizer"),
-        DOUBLE_POWER_CUSTOM("oost_double_power_custom", false, "persist.sys.oost.double_power_custom", "oost.double_power_custom")
+        OOS_LOCALIZER("oost_oos_localizer", false, "persist.sys.oost.oos_localizer", "oost.oos_localizer")
     }
 }

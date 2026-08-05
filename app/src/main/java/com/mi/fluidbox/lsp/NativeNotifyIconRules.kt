@@ -1,4 +1,4 @@
-﻿package com.mi.fluidbox.lsp
+package com.mi.fluidbox.lsp
 
 import android.content.Context
 import android.content.res.Resources

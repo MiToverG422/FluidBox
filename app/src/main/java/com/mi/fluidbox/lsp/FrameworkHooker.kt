@@ -1,4 +1,4 @@
-﻿package com.mi.fluidbox.lsp
+package com.mi.fluidbox.lsp
 
 import android.app.Notification
 import android.content.Context
@@ -685,6 +685,6 @@ object FrameworkHooker {
     }
 
     private fun log(message: String) {
-        XposedBridge.log("$TAG: $message")
+        HookLog.i(TAG, message)
     }
 }

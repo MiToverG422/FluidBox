@@ -1,4 +1,4 @@
-﻿package com.mi.fluidbox.lsp
+package com.mi.fluidbox.lsp
 
 object LspRuntimeStatus {
     private const val PROP_SCOPE_SYSTEM = "debug.oost.lsp.scope.system"
