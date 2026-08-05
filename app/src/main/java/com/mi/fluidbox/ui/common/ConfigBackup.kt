@@ -1,12 +1,20 @@
-﻿package com.mi.fluidbox.ui.common
+package com.mi.fluidbox.ui.common
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
+import com.mi.fluidbox.BuildConfig
 import org.json.JSONArray
 import org.json.JSONObject
+import java.nio.charset.StandardCharsets
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object ConfigBackup {
     private const val BACKUP_VERSION = 1
+    const val MIME_TYPE = "application/json"
+
     private const val APP_PREFS_NAME = "fluidbox_prefs"
     private const val LSP_PREFS_NAME = "lsp_features"
     private const val TYPE_BOOLEAN = "boolean"
@@ -18,6 +26,25 @@ object ConfigBackup {
 
     private val supportedPrefs = listOf(APP_PREFS_NAME, LSP_PREFS_NAME)
 
+    fun defaultFileName(): String {
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+        return "fluidbox_config_$timestamp.json"
+    }
+
+    fun exportToUri(context: Context, uri: Uri) {
+        val bytes = exportToJson(context).toByteArray(StandardCharsets.UTF_8)
+        context.contentResolver.openOutputStream(uri)?.use { output ->
+            output.write(bytes)
+        } ?: error("Cannot open output file")
+    }
+
+    fun importFromUri(context: Context, uri: Uri) {
+        val jsonText = context.contentResolver.openInputStream(uri)?.use { input ->
+            input.bufferedReader(StandardCharsets.UTF_8).readText()
+        } ?: error("Cannot open input file")
+        importFromJson(context, jsonText)
+    }
+
     fun exportToJson(context: Context): String {
         val prefsJson = JSONObject()
         supportedPrefs.forEach { prefsName ->
@@ -27,6 +54,9 @@ object ConfigBackup {
         return JSONObject()
             .put("version", BACKUP_VERSION)
             .put("exportedAt", System.currentTimeMillis())
+            .put("packageName", context.packageName)
+            .put("appVersionName", BuildConfig.VERSION_NAME)
+            .put("appVersionCode", BuildConfig.VERSION_CODE)
             .put("preferences", prefsJson)
             .toString(2)
     }

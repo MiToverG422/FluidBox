@@ -3,5 +3,7 @@
     <locale android:name="en" />
     <locale android:name="zh-CN" />
     <locale android:name="zh-HK" />
+    <locale android:name="zh-MO" />
     <locale android:name="zh-TW" />
+    <locale android:name="yue-Hant" />
 </locale-config>

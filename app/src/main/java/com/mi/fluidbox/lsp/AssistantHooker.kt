@@ -1,4 +1,4 @@
-﻿package com.mi.fluidbox.lsp
+package com.mi.fluidbox.lsp
 
 import android.app.ActivityManager
 import android.content.Context
@@ -103,7 +103,10 @@ object AssistantHooker {
                 "getContext",
                 object : XC_MethodHook() {
                     override fun afterHookedMethod(param: MethodHookParam) {
-                        (param.result as? Context)?.let { systemContext = it }
+                        (param.result as? Context)?.let {
+                            systemContext = it
+                            HookLog.bindContext(it)
+                        }
                     }
                 }
             )
@@ -437,6 +440,7 @@ object AssistantHooker {
 
     private fun triggerGeminiFallbackByShell() {
         runCatching {
+            log("Gemini shell fallback command start")
             Runtime.getRuntime().exec(
                 arrayOf(
                     "am",
@@ -447,6 +451,7 @@ object AssistantHooker {
                     GOOGLE_APP_PACKAGE
                 )
             )
+            log("Gemini shell fallback command issued")
         }.onFailure {
             log("Gemini shell fallback failed", it)
         }
@@ -579,6 +584,6 @@ object AssistantHooker {
     }
 
     private fun log(message: String, throwable: Throwable? = null) {
-        XposedBridge.log("$TAG: $message${throwable?.let { "\n${it.stackTraceToString()}" } ?: ""}")
+        HookLog.i(TAG, message, throwable)
     }
 }

@@ -22,3 +22,8 @@
 
 # Keep modern LSPosed API entry class name referenced by META-INF/xposed/java_init.list.
 -keep class com.mi.fluidbox.lsp.OosLspModuleEntry { *; }
+-keep class com.mi.fluidbox.tools.SurfaceFlingerModeTool { *; }
+
+# KavaRef references this Java 8 reflection API on newer runtimes; Android's R8
+# classpath does not provide it for the configured minSdk.
+-dontwarn java.lang.reflect.AnnotatedType

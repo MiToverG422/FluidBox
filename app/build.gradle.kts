@@ -1,11 +1,19 @@
-﻿plugins {
+import java.time.Instant
+
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 val ciVersionName = (project.findProperty("FLUIDBOX_VERSION_NAME") as String?)
     ?.takeIf { it.isNotBlank() }
-    ?: "0.0.1"
+    ?: "16.0"
 
 val ciVersionCode = (project.findProperty("FLUIDBOX_VERSION_CODE") as String?)
     ?.toIntOrNull()
@@ -16,6 +24,12 @@ val ciSignReleaseWithDebug = (project.findProperty("FLUIDBOX_CI_SIGN_RELEASE_WIT
     ?: false
 
 val isGithubCi = System.getenv("GITHUB_ACTIONS") == "true"
+val fluidBoxBuildTimestamp = System.currentTimeMillis()
+val fluidBoxBuildTime = DateTimeFormatter
+    .ofPattern("yyyy-MM-dd HH:mm:ss 'UTC+8'")
+    .withZone(ZoneId.of("Asia/Shanghai"))
+    .format(Instant.ofEpochMilli(fluidBoxBuildTimestamp))
+val yukiHookApiVersion = libs.versions.yukiHookApi.get()
 
 val releaseStoreFilePath = (project.findProperty("FLUIDBOX_RELEASE_STORE_FILE") as String?)
     ?.takeIf { it.isNotBlank() }
@@ -36,9 +50,7 @@ val hasExternalReleaseSigning =
 android {
     namespace = "com.mi.fluidbox"
     compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
+        version = release(37)
     }
 
     defaultConfig {
@@ -47,6 +59,9 @@ android {
         targetSdk = 36
         versionCode = ciVersionCode
         versionName = ciVersionName
+        buildConfigField("String", "APP_BUILD_TIME", "\"$fluidBoxBuildTime\"")
+        buildConfigField("long", "APP_BUILD_TIMESTAMP", "${fluidBoxBuildTimestamp}L")
+        buildConfigField("String", "YUKIHOOKAPI_VERSION", "\"$yukiHookApiVersion\"")
         ndk {
             abiFilters += listOf("arm64-v8a")
         }
@@ -81,6 +96,18 @@ android {
                 )
             }
         }
+        create("debugSlim") {
+            initWith(getByName("debug"))
+            matchingFallbacks += listOf("debug")
+            isDebuggable = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("debug")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -112,15 +139,37 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     buildFeatures {
         compose = true
-        buildConfig = false
+        buildConfig = true
     }
     androidResources {
-        localeFilters += listOf("en", "zh-rCN", "zh-rHK", "zh-rTW")
+        localeFilters += listOf(
+            "en",
+            "zh-rCN",
+            "zh-rHK",
+            "zh-rMO",
+            "zh-rTW",
+            "b+yue+Hant",
+            "b+zh+CN+catgirl",
+            "ja",
+            "ko",
+            "b+ko+KP",
+            "vi",
+            "ru",
+            "de",
+            "fr",
+            "b+id",
+        )
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
     }
 }
 
@@ -129,17 +178,25 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
+    implementation("androidx.compose.foundation:foundation")
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
-    implementation("androidx.compose.material:material-icons-core")
+    implementation(libs.androidx.palette.ktx)
+    implementation("io.github.suqi8.coui.kmp:coui-ui:1.0.0")
+    implementation("io.github.suqi8.coui.kmp:coui-preference:1.0.0")
+    implementation("io.github.suqi8.coui.kmp:coui-blur:1.0.0")
+    implementation("io.github.suqi8.coui.kmp:coui-icons:1.0.0")
+    implementation("io.github.suqi8.coui.kmp:coui-navigation3-ui:1.0.0")
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kyant.capsule)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     // Root (Magisk) support
     implementation("com.github.topjohnwu.libsu:core:6.0.0")
@@ -151,9 +208,8 @@ dependencies {
 
     // LSPosed ecosystem utility
     implementation("org.lsposed.hiddenapibypass:hiddenapibypass:4.3")
-    // LSPosed Modern API
-    compileOnly("io.github.libxposed:api:101.0.0")
-    implementation("io.github.libxposed:service:101.0.0")
     // Legacy XposedBridge API (current module code path)
     compileOnly("de.robv.android.xposed:api:82")
+    implementation(libs.yukihook.api)
+    ksp(libs.yukihook.ksp.xposed)
 }

@@ -1,4 +1,4 @@
-﻿# 原生通知气泡 Hook 说明
+# 原生通知气泡 Hook 说明
 
 本文档记录 FluidBox 当前测试版中“原生通知气泡”开关的实现方式、Hook 点和测试方法。
 
@@ -34,7 +34,7 @@
 | `app/src/main/java/com/mi/fluidbox/lsp/SettingsHooker.kt` | Settings 侧解除 OEM 跳转，并在系统设置注入 FluidBox 开关页 |
 | `app/src/main/java/com/mi/fluidbox/lsp/LspConfig.kt` | 原生通知气泡开关的持久化、同步和 Xposed 端读取 |
 | `app/src/main/java/com/mi/fluidbox/MainActivity.kt` | App 内开关状态绑定 |
-| `app/src/main/java/com/mi/fluidbox/ui/md3e/Md3eUi.kt` | 功能页 UI 开关 |
+| `app/src/main/java/com/mi/fluidbox/ui/coui/CouiUi.kt` | COUI 页面与功能开关 |
 
 ## 开关同步位置
 

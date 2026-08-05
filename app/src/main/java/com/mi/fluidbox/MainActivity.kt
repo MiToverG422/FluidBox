@@ -1,13 +1,12 @@
-﻿package com.mi.fluidbox
+package com.mi.fluidbox
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -16,47 +15,53 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
-import androidx.compose.ui.res.stringResource
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.mi.fluidbox.lsp.LspConfig
 import com.mi.fluidbox.lsp.LsposedScopeRequester
 import com.mi.fluidbox.ui.common.AppLocale
 import com.mi.fluidbox.ui.common.AppLogStore
+import com.mi.fluidbox.ui.common.AppThemeColorSpec
+import com.mi.fluidbox.ui.common.AppThemeKeyColor
+import com.mi.fluidbox.ui.common.AppThemeMode
+import com.mi.fluidbox.ui.common.AppThemePaletteStyle
+import com.mi.fluidbox.ui.common.AssistantScreenOption
 import com.mi.fluidbox.ui.common.RootAccessState
-import com.mi.fluidbox.ui.common.UiStyleMode
+import com.mi.fluidbox.ui.common.applyAssistantScreenOption
 import com.mi.fluidbox.ui.common.applyLauncherLayoutUnlocked
 import com.mi.fluidbox.ui.common.applyPermissionMonitorVisibility
+import com.mi.fluidbox.ui.common.queryAssistantScreenOption
 import com.mi.fluidbox.ui.common.queryLauncherLayoutUnlocked
 import com.mi.fluidbox.ui.common.queryPermissionMonitorVisibility
 import com.mi.fluidbox.ui.common.queryRootAccess
-import com.mi.fluidbox.ui.md3e.Md3eRoot
-import com.mi.fluidbox.ui.md3e.resolveMd3eColorScheme
+import com.mi.fluidbox.ui.Root
+import com.mi.fluidbox.ui.settings.AppUpdater
 import java.util.Locale
 
 private data class StartupRefreshState(
     val lspSnapshot: LspConfig.UiSnapshot,
     val rootGranted: Boolean,
     val permissionMonitorVisible: Boolean,
-    val launcherLayoutUnlocked: Boolean
+    val launcherLayoutUnlocked: Boolean,
+    val assistantScreenOption: AssistantScreenOption
 )
 
 class MainActivity : ComponentActivity() {
     private companion object {
-        const val THEME_MODE_SYSTEM = 0
-        const val THEME_MODE_LIGHT = 1
-        const val THEME_MODE_DARK = 2
         const val PREF_SPECIAL_FEATURE_VISIBILITY_INITIALIZED = "special_feature_visibility_initialized"
         const val PREF_SHOW_CN_SPECIAL_FEATURES = "show_cn_special_features"
         const val PREF_SHOW_GLOBAL_SPECIAL_FEATURES = "show_global_special_features"
+        const val PREF_HAPTIC_FEEDBACK_ENABLED = "haptic_feedback_enabled"
+        const val PREF_HAPTIC_FEEDBACK_PLUS_ENABLED = "haptic_feedback_plus_enabled"
+        const val PREF_BLUR_EFFECT_ENABLED = "blur_effect_enabled"
+        const val PREF_POP_DIRECTION_FOLLOWS_SWIPE_EDGE = "pop_direction_follows_swipe_edge"
+        const val PREF_SHOW_FPS_MONITOR = "show_fps_monitor"
+        const val PREF_LIQUID_GLASS_BOTTOM_BAR = "liquid_glass_bottom_bar"
+        const val PREF_ONE_CHINA_PRINCIPLE = "one_china_principle"
     }
 
     override fun attachBaseContext(newBase: Context) {
@@ -73,6 +78,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppLogStore.i("App", "MainActivity onCreate")
         setContent {
             val prefs = remember {
                 getSharedPreferences("fluidbox_prefs", MODE_PRIVATE)
@@ -81,38 +87,53 @@ class MainActivity : ComponentActivity() {
             var firstLaunchChecksPassed by rememberSaveable {
                 mutableStateOf(prefs.getBoolean("first_launch_root_granted", false))
             }
-            var predictiveBackEnabled by rememberSaveable {
-                mutableStateOf(prefs.getBoolean("predictive_back_enabled", true))
-            }
-            var showLogsTab by rememberSaveable {
-                mutableStateOf(prefs.getBoolean("show_logs_tab", false))
-            }
-            var showBatteryTab by rememberSaveable {
-                mutableStateOf(prefs.getBoolean("show_battery_tab", false))
-            }
             var showChinaSpecialFeatures by rememberSaveable {
                 mutableStateOf(prefs.getBoolean(PREF_SHOW_CN_SPECIAL_FEATURES, false))
             }
             var showGlobalSpecialFeatures by rememberSaveable {
                 mutableStateOf(prefs.getBoolean(PREF_SHOW_GLOBAL_SPECIAL_FEATURES, false))
             }
-            var showSwitchIcons by rememberSaveable {
-                mutableStateOf(prefs.getBoolean("show_switch_icons", true))
+            var hapticFeedbackEnabled by rememberSaveable {
+                mutableStateOf(prefs.getBoolean(PREF_HAPTIC_FEEDBACK_ENABLED, false))
             }
-            var customMonetEnabled by rememberSaveable {
-                mutableStateOf(prefs.getBoolean("custom_monet_enabled", false))
+            var hapticFeedbackPlusEnabled by rememberSaveable {
+                mutableStateOf(prefs.getBoolean(PREF_HAPTIC_FEEDBACK_PLUS_ENABLED, true))
             }
-            var customMonetSeedColor by rememberSaveable {
-                mutableIntStateOf(prefs.getInt("custom_monet_seed", 0xFF4F6BED.toInt()))
+            var blurEffectEnabled by rememberSaveable {
+                mutableStateOf(prefs.getBoolean(PREF_BLUR_EFFECT_ENABLED, false))
+            }
+            var popDirectionFollowsSwipeEdge by rememberSaveable {
+                mutableStateOf(prefs.getBoolean(PREF_POP_DIRECTION_FOLLOWS_SWIPE_EDGE, false))
+            }
+            var showFpsMonitor by rememberSaveable {
+                mutableStateOf(prefs.getBoolean(PREF_SHOW_FPS_MONITOR, false))
+            }
+            var liquidGlassBottomBarEnabled by rememberSaveable {
+                mutableStateOf(
+                    prefs.getBoolean(PREF_LIQUID_GLASS_BOTTOM_BAR, false) &&
+                            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU,
+                )
+            }
+            var oneChinaPrincipleEnabled by rememberSaveable {
+                mutableStateOf(prefs.getBoolean(PREF_ONE_CHINA_PRINCIPLE, true))
             }
             var currentTab by rememberSaveable {
                 mutableIntStateOf(0)
             }
-            var themeMode by rememberSaveable {
-                mutableIntStateOf(prefs.getInt("theme_mode", THEME_MODE_SYSTEM))
-            }
             var appLanguageTag by rememberSaveable {
                 mutableStateOf(AppLocale.getSelectedLanguageTag(this@MainActivity))
+            }
+            var appThemeMode by rememberSaveable {
+                mutableStateOf(AppThemeMode.get(this@MainActivity))
+            }
+            var appThemeKeyColor by rememberSaveable {
+                mutableStateOf(AppThemeKeyColor.get(this@MainActivity))
+            }
+            var appThemePaletteStyle by rememberSaveable {
+                mutableIntStateOf(AppThemePaletteStyle.get(this@MainActivity))
+            }
+            var appThemeColorSpec by rememberSaveable {
+                mutableIntStateOf(AppThemeColorSpec.get(this@MainActivity))
             }
             val initialLspConfig = remember {
                 LspConfig.readCachedUiSnapshot(this@MainActivity)
@@ -120,14 +141,20 @@ class MainActivity : ComponentActivity() {
             var nativeNotifyIconEnabled by rememberSaveable {
                 mutableStateOf(initialLspConfig.nativeNotifyIconEnabled)
             }
-            var notificationBubbleBlurEnabled by rememberSaveable {
-                mutableStateOf(initialLspConfig.notificationBubbleBlurEnabled)
-            }
-            var notificationBubbleBlurRadiusPx by rememberSaveable {
-                mutableIntStateOf(initialLspConfig.notificationBubbleBlurRadiusPx)
-            }
             var nativeNotificationBubblesEnabled by rememberSaveable {
                 mutableStateOf(initialLspConfig.nativeNotificationBubblesEnabled)
+            }
+            var statusMobileTypeEnabled by rememberSaveable {
+                mutableStateOf(initialLspConfig.statusMobileTypeEnabled)
+            }
+            var statusMobileTypeHideDataOffEnabled by rememberSaveable {
+                mutableStateOf(initialLspConfig.statusMobileTypeHideDataOffEnabled)
+            }
+            var statusMobileTypeHideWifiEnabled by rememberSaveable {
+                mutableStateOf(initialLspConfig.statusMobileTypeHideWifiEnabled)
+            }
+            var settingsForceGoogleEntryEnabled by rememberSaveable {
+                mutableStateOf(initialLspConfig.settingsForceGoogleEntryEnabled)
             }
             var extremeRefresh165Enabled by rememberSaveable {
                 mutableStateOf(initialLspConfig.extremeRefresh165Enabled)
@@ -137,6 +164,9 @@ class MainActivity : ComponentActivity() {
             }
             var launcherLayoutUnlocked by rememberSaveable {
                 mutableStateOf(false)
+            }
+            var assistantScreenOption by rememberSaveable {
+                mutableStateOf(AssistantScreenOption.Default)
             }
             var launcherRegionMode by rememberSaveable {
                 mutableIntStateOf(initialLspConfig.launcherRegionMode)
@@ -171,14 +201,17 @@ class MainActivity : ComponentActivity() {
             var oosLocalizerEnabled by rememberSaveable {
                 mutableStateOf(initialLspConfig.oosLocalizerEnabled)
             }
-            var doublePowerCustomEnabled by rememberSaveable {
-                mutableStateOf(initialLspConfig.doublePowerCustomEnabled)
+            var oosLocalizerConfigMode by rememberSaveable {
+                mutableIntStateOf(initialLspConfig.oosLocalizerConfigMode)
             }
-            var doublePowerTargetPackage by rememberSaveable {
-                mutableStateOf(initialLspConfig.doublePowerTargetPackage)
+            var oosLocalizerRegion by rememberSaveable {
+                mutableStateOf(initialLspConfig.oosLocalizerRegion)
             }
-            var doublePowerTargetActivity by rememberSaveable {
-                mutableStateOf(initialLspConfig.doublePowerTargetActivity)
+            var oosLocalizerLocale by rememberSaveable {
+                mutableStateOf(initialLspConfig.oosLocalizerLocale)
+            }
+            var oosLocalizerModel by rememberSaveable {
+                mutableStateOf(initialLspConfig.oosLocalizerModel)
             }
             var assistantPowerMode by rememberSaveable {
                 mutableIntStateOf(initialLspConfig.assistantPowerMode)
@@ -194,8 +227,6 @@ class MainActivity : ComponentActivity() {
             }
             fun applyLspConfigSnapshot(snapshot: LspConfig.UiSnapshot) {
                 nativeNotifyIconEnabled = snapshot.nativeNotifyIconEnabled
-                notificationBubbleBlurEnabled = snapshot.notificationBubbleBlurEnabled
-                notificationBubbleBlurRadiusPx = snapshot.notificationBubbleBlurRadiusPx
                 nativeNotificationBubblesEnabled = snapshot.nativeNotificationBubblesEnabled
                 extremeRefresh165Enabled = snapshot.extremeRefresh165Enabled
                 launcherRegionMode = snapshot.launcherRegionMode
@@ -208,48 +239,23 @@ class MainActivity : ComponentActivity() {
                 aodPanoramicSupportEnabled = snapshot.aodPanoramicSupportEnabled
                 aodSettingsSwitchEnabled = snapshot.aodSettingsSwitchEnabled
                 aodSingleClickBlockEnabled = snapshot.aodSingleClickBlockEnabled
+                statusMobileTypeEnabled = snapshot.statusMobileTypeEnabled
+                statusMobileTypeHideDataOffEnabled = snapshot.statusMobileTypeHideDataOffEnabled
+                statusMobileTypeHideWifiEnabled = snapshot.statusMobileTypeHideWifiEnabled
+                settingsForceGoogleEntryEnabled = snapshot.settingsForceGoogleEntryEnabled
                 oosLocalizerEnabled = snapshot.oosLocalizerEnabled
-                doublePowerCustomEnabled = snapshot.doublePowerCustomEnabled
-                doublePowerTargetPackage = snapshot.doublePowerTargetPackage
-                doublePowerTargetActivity = snapshot.doublePowerTargetActivity
+                oosLocalizerConfigMode = snapshot.oosLocalizerConfigMode
+                oosLocalizerRegion = snapshot.oosLocalizerRegion
+                oosLocalizerLocale = snapshot.oosLocalizerLocale
+                oosLocalizerModel = snapshot.oosLocalizerModel
                 assistantPowerMode = snapshot.assistantPowerMode
                 assistantGestureCircleEnabled = snapshot.assistantGestureCircleEnabled
             }
-            val reloadConfigurationFromPrefs = {
-                predictiveBackEnabled = prefs.getBoolean("predictive_back_enabled", true)
-                showLogsTab = prefs.getBoolean("show_logs_tab", false)
-                showBatteryTab = prefs.getBoolean("show_battery_tab", false)
-                showChinaSpecialFeatures = prefs.getBoolean(PREF_SHOW_CN_SPECIAL_FEATURES, false)
-                showGlobalSpecialFeatures = prefs.getBoolean(PREF_SHOW_GLOBAL_SPECIAL_FEATURES, false)
-                showSwitchIcons = prefs.getBoolean("show_switch_icons", true)
-                customMonetEnabled = prefs.getBoolean("custom_monet_enabled", false)
-                customMonetSeedColor = prefs.getInt("custom_monet_seed", 0xFF4F6BED.toInt())
-                themeMode = prefs.getInt("theme_mode", THEME_MODE_SYSTEM)
-                appLanguageTag = AppLocale.getSelectedLanguageTag(this@MainActivity)
-                rootCheckScope.launch {
-                    val refreshState = withContext(Dispatchers.IO) {
-                        StartupRefreshState(
-                            lspSnapshot = LspConfig.readSyncedUiSnapshot(this@MainActivity),
-                            rootGranted = firstLaunchChecksPassed,
-                            permissionMonitorVisible = queryPermissionMonitorVisibility(),
-                            launcherLayoutUnlocked = queryLauncherLayoutUnlocked()
-                        )
-                    }
-                    applyLspConfigSnapshot(refreshState.lspSnapshot)
-                    permissionMonitorVisible = refreshState.permissionMonitorVisible
-                    launcherLayoutUnlocked = refreshState.launcherLayoutUnlocked
-                }
-                Unit
-            }
-            val systemDarkTheme = isSystemInDarkTheme()
-            val darkTheme = when (themeMode) {
-                THEME_MODE_LIGHT -> false
-                THEME_MODE_DARK -> true
-                else -> systemDarkTheme
-            }
-
             LaunchedEffect(Unit) {
                 withFrameNanos { }
+                withContext(Dispatchers.IO) {
+                    AppLogStore.initialize(applicationContext)
+                }
                 if (!prefs.getBoolean(PREF_SPECIAL_FEATURE_VISIBILITY_INITIALIZED, false)) {
                     val isChinaMainland = withContext(Dispatchers.IO) {
                         detectRegionCode() == "CN"
@@ -263,15 +269,16 @@ class MainActivity : ComponentActivity() {
                     showGlobalSpecialFeatures = !isChinaMainland
                 }
                 AppLogStore.i("App", "MainActivity started")
+                delay(1_200)
                 val startupState = withContext(Dispatchers.IO) {
                     LsposedScopeRequester.initialize(this@MainActivity)
-                    LspConfig.syncTogglesForBoot(this@MainActivity)
                     val currentRootAccess = queryRootAccess(this@MainActivity)
                     StartupRefreshState(
                         lspSnapshot = LspConfig.readSyncedUiSnapshot(this@MainActivity),
                         rootGranted = currentRootAccess.state == RootAccessState.Granted,
                         permissionMonitorVisible = queryPermissionMonitorVisibility(),
-                        launcherLayoutUnlocked = queryLauncherLayoutUnlocked()
+                        launcherLayoutUnlocked = queryLauncherLayoutUnlocked(),
+                        assistantScreenOption = queryAssistantScreenOption()
                     )
                 }
                 applyLspConfigSnapshot(startupState.lspSnapshot)
@@ -280,8 +287,21 @@ class MainActivity : ComponentActivity() {
                 }
                 permissionMonitorVisible = startupState.permissionMonitorVisible
                 launcherLayoutUnlocked = startupState.launcherLayoutUnlocked
+                assistantScreenOption = startupState.assistantScreenOption
                 resumeRefreshEnabled = true
                 settingsEffectsReady = true
+                rootCheckScope.launch {
+                    delay(2_000)
+                    withContext(Dispatchers.IO) {
+                        LspConfig.syncTogglesForBoot(this@MainActivity)
+                    }
+                }
+                rootCheckScope.launch {
+                    delay(5_000)
+                    withContext(Dispatchers.IO) {
+                        AppUpdater.runAutomaticSilentUpdate(this@MainActivity)
+                    }
+                }
             }
             DisposableEffect(resumeRefreshEnabled) {
                 val observer = LifecycleEventObserver { _, event ->
@@ -293,40 +313,21 @@ class MainActivity : ComponentActivity() {
                                     lspSnapshot = LspConfig.readSyncedUiSnapshot(this@MainActivity),
                                     rootGranted = currentRootAccess.state == RootAccessState.Granted,
                                     permissionMonitorVisible = queryPermissionMonitorVisibility(),
-                                    launcherLayoutUnlocked = queryLauncherLayoutUnlocked()
+                                    launcherLayoutUnlocked = queryLauncherLayoutUnlocked(),
+                                    assistantScreenOption = queryAssistantScreenOption()
                                 )
                             }
                             applyLspConfigSnapshot(refreshState.lspSnapshot)
                             firstLaunchChecksPassed = refreshState.rootGranted
                             permissionMonitorVisible = refreshState.permissionMonitorVisible
                             launcherLayoutUnlocked = refreshState.launcherLayoutUnlocked
+                            assistantScreenOption = refreshState.assistantScreenOption
                         }
                     }
                 }
                 lifecycle.addObserver(observer)
                 onDispose {
                     lifecycle.removeObserver(observer)
-                }
-            }
-            LaunchedEffect(predictiveBackEnabled) {
-                if (!settingsEffectsReady) return@LaunchedEffect
-                prefs.edit().putBoolean("predictive_back_enabled", predictiveBackEnabled).apply()
-                AppLogStore.i("Settings", "Predictive back: $predictiveBackEnabled")
-            }
-            LaunchedEffect(showLogsTab) {
-                if (!settingsEffectsReady) return@LaunchedEffect
-                prefs.edit().putBoolean("show_logs_tab", showLogsTab).apply()
-                AppLogStore.i("Settings", "Show logs tab: $showLogsTab")
-                if (!showLogsTab && currentTab == 2) {
-                    currentTab = 0
-                }
-            }
-            LaunchedEffect(showBatteryTab) {
-                if (!settingsEffectsReady) return@LaunchedEffect
-                prefs.edit().putBoolean("show_battery_tab", showBatteryTab).apply()
-                AppLogStore.i("Settings", "Show battery tab: $showBatteryTab")
-                if (!showBatteryTab && currentTab == 4) {
-                    currentTab = 0
                 }
             }
             LaunchedEffect(showChinaSpecialFeatures) {
@@ -343,25 +344,54 @@ class MainActivity : ComponentActivity() {
                     .apply()
                 AppLogStore.i("Settings", "Show global special features: $showGlobalSpecialFeatures")
             }
-            LaunchedEffect(showSwitchIcons) {
+            LaunchedEffect(hapticFeedbackEnabled) {
                 if (!settingsEffectsReady) return@LaunchedEffect
-                prefs.edit().putBoolean("show_switch_icons", showSwitchIcons).apply()
-                AppLogStore.i("Settings", "Show switch icons: $showSwitchIcons")
+                prefs.edit()
+                    .putBoolean(PREF_HAPTIC_FEEDBACK_ENABLED, hapticFeedbackEnabled)
+                    .apply()
+                AppLogStore.i("Settings", "Haptic feedback: $hapticFeedbackEnabled")
             }
-            LaunchedEffect(customMonetEnabled) {
+            LaunchedEffect(hapticFeedbackPlusEnabled) {
                 if (!settingsEffectsReady) return@LaunchedEffect
-                prefs.edit().putBoolean("custom_monet_enabled", customMonetEnabled).apply()
-                AppLogStore.i("Settings", "Custom Monet: $customMonetEnabled")
+                prefs.edit()
+                    .putBoolean(PREF_HAPTIC_FEEDBACK_PLUS_ENABLED, hapticFeedbackPlusEnabled)
+                    .apply()
+                AppLogStore.i("Settings", "ColorOS-style vibration: $hapticFeedbackPlusEnabled")
             }
-            LaunchedEffect(customMonetSeedColor) {
+            LaunchedEffect(blurEffectEnabled) {
                 if (!settingsEffectsReady) return@LaunchedEffect
-                prefs.edit().putInt("custom_monet_seed", customMonetSeedColor).apply()
-                AppLogStore.i("Settings", "Monet seed changed: 0x${customMonetSeedColor.toUInt().toString(16)}")
+                prefs.edit()
+                    .putBoolean(PREF_BLUR_EFFECT_ENABLED, blurEffectEnabled)
+                    .apply()
+                AppLogStore.i("Settings", "Blur effect: $blurEffectEnabled")
             }
-            LaunchedEffect(themeMode) {
+            LaunchedEffect(popDirectionFollowsSwipeEdge) {
                 if (!settingsEffectsReady) return@LaunchedEffect
-                prefs.edit().putInt("theme_mode", themeMode).apply()
-                AppLogStore.i("Settings", "Theme mode: $themeMode")
+                prefs.edit()
+                    .putBoolean(PREF_POP_DIRECTION_FOLLOWS_SWIPE_EDGE, popDirectionFollowsSwipeEdge)
+                    .apply()
+                AppLogStore.i("Settings", "Pop follows swipe edge: $popDirectionFollowsSwipeEdge")
+            }
+            LaunchedEffect(showFpsMonitor) {
+                if (!settingsEffectsReady) return@LaunchedEffect
+                prefs.edit()
+                    .putBoolean(PREF_SHOW_FPS_MONITOR, showFpsMonitor)
+                    .apply()
+                AppLogStore.i("Settings", "Show FPS monitor: $showFpsMonitor")
+            }
+            LaunchedEffect(liquidGlassBottomBarEnabled) {
+                if (!settingsEffectsReady) return@LaunchedEffect
+                prefs.edit()
+                    .putBoolean(PREF_LIQUID_GLASS_BOTTOM_BAR, liquidGlassBottomBarEnabled)
+                    .apply()
+                AppLogStore.i("Settings", "LiquidGlass bottom bar: $liquidGlassBottomBarEnabled")
+            }
+            LaunchedEffect(oneChinaPrincipleEnabled) {
+                if (!settingsEffectsReady) return@LaunchedEffect
+                prefs.edit()
+                    .putBoolean(PREF_ONE_CHINA_PRINCIPLE, oneChinaPrincipleEnabled)
+                    .apply()
+                AppLogStore.i("Settings", "One China principle: $oneChinaPrincipleEnabled")
             }
             LaunchedEffect(firstLaunchChecksPassed) {
                 if (!settingsEffectsReady) return@LaunchedEffect
@@ -375,32 +405,6 @@ class MainActivity : ComponentActivity() {
                 }
                 AppLogStore.i("NativeNotifyIcon", "Native notify icon toggle: $nativeNotifyIconEnabled")
             }
-            LaunchedEffect(notificationBubbleBlurEnabled) {
-                if (!settingsEffectsReady) return@LaunchedEffect
-                withContext(Dispatchers.IO) {
-                    LspConfig.setNotificationBubbleBlurEnabled(
-                        this@MainActivity,
-                        notificationBubbleBlurEnabled
-                    )
-                }
-                AppLogStore.i(
-                    "NotificationBubbleBlur",
-                    "Notification bubble blur toggle: $notificationBubbleBlurEnabled"
-                )
-            }
-            LaunchedEffect(notificationBubbleBlurRadiusPx) {
-                if (!settingsEffectsReady) return@LaunchedEffect
-                withContext(Dispatchers.IO) {
-                    LspConfig.setNotificationBubbleBlurRadiusPx(
-                        this@MainActivity,
-                        notificationBubbleBlurRadiusPx
-                    )
-                }
-                AppLogStore.i(
-                    "NotificationBubbleBlur",
-                    "Notification bubble blur radius: ${notificationBubbleBlurRadiusPx}px"
-                )
-            }
             LaunchedEffect(nativeNotificationBubblesEnabled) {
                 if (!settingsEffectsReady) return@LaunchedEffect
                 withContext(Dispatchers.IO) {
@@ -413,6 +417,49 @@ class MainActivity : ComponentActivity() {
                     "NativeNotificationBubbles",
                     "Native notification bubbles toggle: $nativeNotificationBubblesEnabled"
                 )
+            }
+            LaunchedEffect(statusMobileTypeEnabled) {
+                if (!settingsEffectsReady) return@LaunchedEffect
+                withContext(Dispatchers.IO) {
+                    LspConfig.setStatusMobileTypeEnabled(this@MainActivity, statusMobileTypeEnabled)
+                }
+                AppLogStore.i("StatusMobileType", "Mobile type toggle: $statusMobileTypeEnabled")
+            }
+            LaunchedEffect(statusMobileTypeHideDataOffEnabled) {
+                if (!settingsEffectsReady) return@LaunchedEffect
+                withContext(Dispatchers.IO) {
+                    LspConfig.setStatusMobileTypeHideDataOffEnabled(
+                        this@MainActivity,
+                        statusMobileTypeHideDataOffEnabled
+                    )
+                }
+                AppLogStore.i(
+                    "StatusMobileType",
+                    "Mobile type hide when data off: $statusMobileTypeHideDataOffEnabled"
+                )
+            }
+            LaunchedEffect(statusMobileTypeHideWifiEnabled) {
+                if (!settingsEffectsReady) return@LaunchedEffect
+                withContext(Dispatchers.IO) {
+                    LspConfig.setStatusMobileTypeHideWifiEnabled(
+                        this@MainActivity,
+                        statusMobileTypeHideWifiEnabled
+                    )
+                }
+                AppLogStore.i(
+                    "StatusMobileType",
+                    "Mobile type hide on Wi-Fi: $statusMobileTypeHideWifiEnabled"
+                )
+            }
+            LaunchedEffect(settingsForceGoogleEntryEnabled) {
+                if (!settingsEffectsReady) return@LaunchedEffect
+                withContext(Dispatchers.IO) {
+                    LspConfig.setSettingsForceGoogleEntryEnabled(
+                        this@MainActivity,
+                        settingsForceGoogleEntryEnabled
+                    )
+                }
+                AppLogStore.i("SettingsHook", "Force Google entry: $settingsForceGoogleEntryEnabled")
             }
             LaunchedEffect(extremeRefresh165Enabled) {
                 if (!settingsEffectsReady) return@LaunchedEffect
@@ -527,26 +574,33 @@ class MainActivity : ComponentActivity() {
                 }
                 AppLogStore.i("OosLocalizer", "OOS localizer toggle: $oosLocalizerEnabled")
             }
-            LaunchedEffect(doublePowerCustomEnabled) {
+            LaunchedEffect(oosLocalizerConfigMode) {
                 if (!settingsEffectsReady) return@LaunchedEffect
                 withContext(Dispatchers.IO) {
-                    LspConfig.setDoublePowerCustomEnabled(this@MainActivity, doublePowerCustomEnabled)
+                    LspConfig.setOosLocalizerConfigMode(this@MainActivity, oosLocalizerConfigMode)
                 }
-                AppLogStore.i("DoublePower", "Double power custom toggle: $doublePowerCustomEnabled")
+                AppLogStore.i("OosLocalizer", "Global localizer config mode: $oosLocalizerConfigMode")
             }
-            LaunchedEffect(doublePowerTargetPackage) {
+            LaunchedEffect(oosLocalizerRegion) {
                 if (!settingsEffectsReady) return@LaunchedEffect
                 withContext(Dispatchers.IO) {
-                    LspConfig.setDoublePowerTargetPackage(this@MainActivity, doublePowerTargetPackage)
+                    LspConfig.setOosLocalizerRegion(this@MainActivity, oosLocalizerRegion)
                 }
-                AppLogStore.i("DoublePower", "Double power target package: $doublePowerTargetPackage")
+                AppLogStore.i("OosLocalizer", "Global localizer region: $oosLocalizerRegion")
             }
-            LaunchedEffect(doublePowerTargetActivity) {
+            LaunchedEffect(oosLocalizerLocale) {
                 if (!settingsEffectsReady) return@LaunchedEffect
                 withContext(Dispatchers.IO) {
-                    LspConfig.setDoublePowerTargetActivity(this@MainActivity, doublePowerTargetActivity)
+                    LspConfig.setOosLocalizerLocale(this@MainActivity, oosLocalizerLocale)
                 }
-                AppLogStore.i("DoublePower", "Double power target activity: $doublePowerTargetActivity")
+                AppLogStore.i("OosLocalizer", "Global localizer locale: $oosLocalizerLocale")
+            }
+            LaunchedEffect(oosLocalizerModel) {
+                if (!settingsEffectsReady) return@LaunchedEffect
+                withContext(Dispatchers.IO) {
+                    LspConfig.setOosLocalizerModel(this@MainActivity, oosLocalizerModel)
+                }
+                AppLogStore.i("OosLocalizer", "Global localizer model: $oosLocalizerModel")
             }
             LaunchedEffect(assistantPowerMode) {
                 if (!settingsEffectsReady) return@LaunchedEffect
@@ -566,26 +620,38 @@ class MainActivity : ComponentActivity() {
                 AppLogStore.i("Assistant", "Gesture Circle to Search: $assistantGestureCircleEnabled")
             }
 
-            Md3eRoot(
-                darkTheme = darkTheme,
+            Root(
                 currentTab = currentTab,
                 onTabChange = { currentTab = it },
-                showLogsTab = showLogsTab,
-                onShowLogsTabChange = { showLogsTab = it },
-                showBatteryTab = showBatteryTab,
-                onShowBatteryTabChange = { showBatteryTab = it },
+                rootGranted = firstLaunchChecksPassed,
                 showChinaSpecialFeatures = showChinaSpecialFeatures,
                 onShowChinaSpecialFeaturesChange = { showChinaSpecialFeatures = it },
                 showGlobalSpecialFeatures = showGlobalSpecialFeatures,
                 onShowGlobalSpecialFeaturesChange = { showGlobalSpecialFeatures = it },
-                predictiveBackEnabled = predictiveBackEnabled,
-                onPredictiveBackEnabledChange = { predictiveBackEnabled = it },
-                customMonetEnabled = customMonetEnabled,
-                onCustomMonetEnabledChange = { customMonetEnabled = it },
-                customMonetSeedColor = customMonetSeedColor,
-                onCustomMonetSeedColorChange = { customMonetSeedColor = it },
-                themeMode = themeMode,
-                onThemeModeChange = { themeMode = it },
+                hapticFeedbackEnabled = hapticFeedbackEnabled,
+                onHapticFeedbackEnabledChange = { enabled ->
+                    hapticFeedbackEnabled = enabled
+                    if (enabled) {
+                        hapticFeedbackPlusEnabled = false
+                    }
+                },
+                hapticFeedbackPlusEnabled = hapticFeedbackPlusEnabled,
+                onHapticFeedbackPlusEnabledChange = { enabled ->
+                    hapticFeedbackPlusEnabled = enabled
+                    if (enabled) {
+                        hapticFeedbackEnabled = false
+                    }
+                },
+                blurEffectEnabled = blurEffectEnabled,
+                onBlurEffectEnabledChange = { blurEffectEnabled = it },
+                popDirectionFollowsSwipeEdge = popDirectionFollowsSwipeEdge,
+                onPopDirectionFollowsSwipeEdgeChange = { popDirectionFollowsSwipeEdge = it },
+                showFpsMonitor = showFpsMonitor,
+                onShowFpsMonitorChange = { showFpsMonitor = it },
+                liquidGlassBottomBarEnabled = liquidGlassBottomBarEnabled,
+                onLiquidGlassBottomBarEnabledChange = { liquidGlassBottomBarEnabled = it },
+                oneChinaPrincipleEnabled = oneChinaPrincipleEnabled,
+                onOneChinaPrincipleEnabledChange = { oneChinaPrincipleEnabled = it },
                 appLanguageTag = appLanguageTag,
                 onAppLanguageChange = { languageTag ->
                     if (appLanguageTag != languageTag) {
@@ -594,18 +660,26 @@ class MainActivity : ComponentActivity() {
                         recreateForLocaleChange()
                     }
                 },
-                showSwitchIcons = showSwitchIcons,
-                onShowSwitchIconsChange = { showSwitchIcons = it },
-                nativeNotifyIconEnabled = nativeNotifyIconEnabled,
-                onNativeNotifyIconEnabledChange = { nativeNotifyIconEnabled = it },
-                notificationBubbleBlurEnabled = notificationBubbleBlurEnabled,
-                onNotificationBubbleBlurEnabledChange = { notificationBubbleBlurEnabled = it },
-                notificationBubbleBlurRadiusPx = notificationBubbleBlurRadiusPx,
-                onNotificationBubbleBlurRadiusPxChange = { notificationBubbleBlurRadiusPx = it },
-                nativeNotificationBubblesEnabled = nativeNotificationBubblesEnabled,
-                onNativeNotificationBubblesEnabledChange = { nativeNotificationBubblesEnabled = it },
-                extremeRefresh165Enabled = extremeRefresh165Enabled,
-                onExtremeRefresh165EnabledChange = { extremeRefresh165Enabled = it },
+                appThemeMode = appThemeMode,
+                onAppThemeModeChange = { mode ->
+                    appThemeMode = mode
+                    AppThemeMode.set(this@MainActivity, mode)
+                },
+                appThemeKeyColor = appThemeKeyColor,
+                onAppThemeKeyColorChange = { color ->
+                    appThemeKeyColor = color
+                    AppThemeKeyColor.set(this@MainActivity, color)
+                },
+                appThemePaletteStyle = appThemePaletteStyle,
+                onAppThemePaletteStyleChange = { style ->
+                    appThemePaletteStyle = style
+                    AppThemePaletteStyle.set(this@MainActivity, style)
+                },
+                appThemeColorSpec = appThemeColorSpec,
+                onAppThemeColorSpecChange = { spec ->
+                    appThemeColorSpec = spec
+                    AppThemeColorSpec.set(this@MainActivity, spec)
+                },
                 permissionMonitorVisible = permissionMonitorVisible,
                 onPermissionMonitorVisibleChange = { enabled ->
                     permissionMonitorVisible = enabled
@@ -620,6 +694,22 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 },
+                nativeNotifyIconEnabled = nativeNotifyIconEnabled,
+                onNativeNotifyIconEnabledChange = { nativeNotifyIconEnabled = it },
+                nativeNotificationBubblesEnabled = nativeNotificationBubblesEnabled,
+                onNativeNotificationBubblesEnabledChange = { nativeNotificationBubblesEnabled = it },
+                statusMobileTypeEnabled = statusMobileTypeEnabled,
+                onStatusMobileTypeEnabledChange = { statusMobileTypeEnabled = it },
+                statusMobileTypeHideDataOffEnabled = statusMobileTypeHideDataOffEnabled,
+                onStatusMobileTypeHideDataOffEnabledChange = {
+                    statusMobileTypeHideDataOffEnabled = it
+                },
+                statusMobileTypeHideWifiEnabled = statusMobileTypeHideWifiEnabled,
+                onStatusMobileTypeHideWifiEnabledChange = { statusMobileTypeHideWifiEnabled = it },
+                settingsForceGoogleEntryEnabled = settingsForceGoogleEntryEnabled,
+                onSettingsForceGoogleEntryEnabledChange = { settingsForceGoogleEntryEnabled = it },
+                extremeRefresh165Enabled = extremeRefresh165Enabled,
+                onExtremeRefresh165EnabledChange = { extremeRefresh165Enabled = it },
                 launcherLayoutUnlocked = launcherLayoutUnlocked,
                 onLauncherLayoutUnlockedChange = { enabled ->
                     launcherLayoutUnlocked = enabled
@@ -630,6 +720,20 @@ class MainActivity : ComponentActivity() {
                             AppLogStore.w(
                                 "LauncherLayout",
                                 "Toggle apply failed: ${result.detail.orEmpty()}"
+                            )
+                        }
+                    }
+                },
+                assistantScreenOption = assistantScreenOption,
+                onAssistantScreenOptionChange = { option ->
+                    assistantScreenOption = option
+                    rootCheckScope.launch {
+                        val result = applyAssistantScreenOption(option)
+                        assistantScreenOption = queryAssistantScreenOption()
+                        if (!result.success) {
+                            AppLogStore.w(
+                                "DesktopAssistant",
+                                "Apply failed: ${result.detail.orEmpty()}"
                             )
                         }
                     }
@@ -656,37 +760,19 @@ class MainActivity : ComponentActivity() {
                 onAodSingleClickBlockEnabledChange = { aodSingleClickBlockEnabled = it },
                 oosLocalizerEnabled = oosLocalizerEnabled,
                 onOosLocalizerEnabledChange = { oosLocalizerEnabled = it },
-                doublePowerCustomEnabled = doublePowerCustomEnabled,
-                onDoublePowerCustomEnabledChange = { doublePowerCustomEnabled = it },
-                doublePowerTargetPackage = doublePowerTargetPackage,
-                onDoublePowerTargetPackageChange = { doublePowerTargetPackage = it },
-                doublePowerTargetActivity = doublePowerTargetActivity,
-                onDoublePowerTargetActivityChange = { doublePowerTargetActivity = it },
+                oosLocalizerConfigMode = oosLocalizerConfigMode,
+                onOosLocalizerConfigModeChange = { oosLocalizerConfigMode = it },
+                oosLocalizerRegion = oosLocalizerRegion,
+                onOosLocalizerRegionChange = { oosLocalizerRegion = it },
+                oosLocalizerLocale = oosLocalizerLocale,
+                onOosLocalizerLocaleChange = { oosLocalizerLocale = it },
+                oosLocalizerModel = oosLocalizerModel,
+                onOosLocalizerModelChange = { oosLocalizerModel = it },
                 assistantPowerMode = assistantPowerMode,
                 onAssistantPowerModeChange = { assistantPowerMode = it },
                 assistantGestureCircleEnabled = assistantGestureCircleEnabled,
                 onAssistantGestureCircleEnabledChange = { assistantGestureCircleEnabled = it },
-                currentUiStyle = UiStyleMode.Md3e.prefValue,
-                onUiStyleChange = {},
-                uiStyleMode = UiStyleMode.Md3e,
-                onConfigImported = reloadConfigurationFromPrefs
             )
-
-            if (!firstLaunchChecksPassed) {
-                MaterialTheme(
-                    colorScheme = resolveMd3eColorScheme(
-                        context = this@MainActivity,
-                        darkTheme = darkTheme,
-                        customMonetEnabled = customMonetEnabled,
-                        customMonetSeedColor = customMonetSeedColor
-                    )
-                ) {
-                    FirstLaunchRootDialog(
-                        onGranted = { firstLaunchChecksPassed = true },
-                        onExit = { finish() }
-                    )
-                }
-            }
         }
     }
 
@@ -740,67 +826,4 @@ class MainActivity : ComponentActivity() {
                 ?.takeIf { it.isNotEmpty() }
         }.getOrNull()
     }
-}
-
-@Composable
-private fun FirstLaunchRootDialog(
-    onGranted: () -> Unit,
-    onExit: () -> Unit
-) {
-    var requesting by remember { mutableStateOf(false) }
-    var errorText by remember { mutableStateOf<String?>(null) }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val deniedText = stringResource(R.string.first_launch_root_dialog_denied)
-
-    AlertDialog(
-        onDismissRequest = {},
-        title = {
-            Text(text = stringResource(R.string.first_launch_root_dialog_title))
-        },
-        text = {
-            Text(
-                text = errorText ?: stringResource(R.string.first_launch_root_dialog_message)
-            )
-        },
-        confirmButton = {
-            TextButton(
-                enabled = !requesting,
-                onClick = {
-                    requesting = true
-                    errorText = null
-                    scope.launch {
-                        val rootResult = queryRootAccess(context)
-                        val hasRoot = rootResult.state == RootAccessState.Granted
-                        AppLogStore.i(
-                            "FirstLaunch",
-                            "Checks result: root=$hasRoot"
-                        )
-                        requesting = false
-                        if (hasRoot) {
-                            onGranted()
-                        } else {
-                            errorText = deniedText
-                        }
-                    }
-                }
-            ) {
-                Text(
-                    text = if (requesting) {
-                        stringResource(R.string.first_launch_root_dialog_requesting)
-                    } else {
-                        stringResource(R.string.first_launch_root_dialog_confirm)
-                    }
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(
-                enabled = !requesting,
-                onClick = onExit
-            ) {
-                Text(text = stringResource(R.string.first_launch_root_dialog_exit))
-            }
-        }
-    )
 }

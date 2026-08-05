@@ -1,4 +1,4 @@
-﻿package com.mi.fluidbox.lsp
+package com.mi.fluidbox.lsp
 
 import android.content.ContentResolver
 import android.database.Cursor
@@ -82,19 +82,9 @@ object OosLocalizerHooker {
         "com.oplus.coreapp.appfeature.AppFeatureProviderUtils"
     )
 
-    private val propertyRules = mapOf(
-        "persist.sys.oplus.region" to "CN",
-        "ro.oplus.pipeline.region" to "CN",
-        "ro.vendor.oplus.regionmark" to "CN",
-        "persist.sys.oppo.region" to "CN",
-        "user.region" to "CN",
-        "ro.vendor.oplus.version" to "CN",
-        "ro.product.locale" to "zh-CN",
-        "persist.sys.locale" to "zh-CN",
+    private val staticPropertyRules = mapOf(
         "ro.oplus.image.system_ext.area" to "domestic",
         "ro.oplus.image.my_stock.type" to "domestic_OPPO",
-        "ro.product.name" to "PMA120",
-        "ro.product.model" to "PMA120",
         "ro.build.display.id" to "PMA120_16.0.7.210(CN01)",
         "ro.build.display.full_id" to
             "PMA120domestic_11_16.0.7.210(CN01)_2026051318470000",
@@ -106,24 +96,16 @@ object OosLocalizerHooker {
         "persist.bluetooth.airpods_support" to "true"
     )
 
-    private val buildRules = mapOf(
-        "MODEL" to "PMA120"
+    private val appFeatureExistsRuleKeys = setOf(
+        "com.android.incallui.region_cn",
+        "com.android.launcher.CN_VERSION",
+        "com.android.settings.cn_version",
+        "com.oplusos.deepthinker.cn.enable"
     )
 
-    private val appFeatureExistsRules = mapOf(
-        "com.android.incallui.region_cn" to true,
-        "com.android.launcher.CN_VERSION" to true,
-        "com.android.settings.cn_version" to true,
-        "com.oplusos.deepthinker.cn.enable" to true
-    )
-
-    private val appFeatureValueRules = mapOf(
-        "com.android.launcher.REGION_NAME" to "String:CN",
-        "com.oplus.aipaint.area" to "String:CN",
-        "com.oplus.aiwriter.main_host_address" to
-            "String:aitool-infer-cn.heytapmobi.com",
-        "com.oplus.smartanalysis.rule_server_host" to
-            "String:https://iwisdom.apps.coloros.com"
+    private val staticAppFeatureValueRuleKeys = setOf(
+        "com.oplus.aiwriter.main_host_address",
+        "com.oplus.smartanalysis.rule_server_host"
     )
 
     private val installedHookKeys = ConcurrentHashMap.newKeySet<String>()
@@ -139,20 +121,42 @@ object OosLocalizerHooker {
         val localizerEnabled = LspConfig.isOosLocalizerEnabledXposed()
         val launcherRegionEnabled = packageName == "com.android.launcher" &&
             LspConfig.getLauncherRegionModeXposed() != LspConfig.LAUNCHER_REGION_MODE_OFF
-        if (!localizerEnabled && !launcherRegionEnabled) return
+        val packageScopeEnabled = !isCustomLocalizerConfig() ||
+            LspConfig.isOosLocalizerPackageEnabledXposed(packageName)
+        if ((!localizerEnabled || !packageScopeEnabled) &&
+            !launcherRegionEnabled
+        ) return
         log("install hooks for $packageName")
-        hookAppFeatureResolverQuery()
-        hookAppFeatureKeyMethods(classLoader)
+        if (LspConfig.isOosLocalizerFeatureEnabledXposed(LspConfig.OOS_LOCALIZER_FEATURE_APP_FEATURES) ||
+            launcherRegionEnabled
+        ) {
+            hookAppFeatureResolverQuery()
+            hookAppFeatureKeyMethods(classLoader)
+        }
         if (localizerEnabled) {
-            spoofBuildModel(packageName)
-            spoofDefaultLocale(packageName)
-            hookSystemProperties(classLoader)
-            hookJavaSystemProperties()
+            val buildModelEnabled =
+                LspConfig.isOosLocalizerFeatureEnabledXposed(LspConfig.OOS_LOCALIZER_FEATURE_BUILD_MODEL)
+            val localeEnabled =
+                LspConfig.isOosLocalizerFeatureEnabledXposed(LspConfig.OOS_LOCALIZER_FEATURE_LOCALE)
+            val propertyHookNeeded = buildModelEnabled ||
+                localeEnabled ||
+                LspConfig.isOosLocalizerFeatureEnabledXposed(LspConfig.OOS_LOCALIZER_FEATURE_REGION) ||
+                LspConfig.isOosLocalizerFeatureEnabledXposed(LspConfig.OOS_LOCALIZER_FEATURE_PROPERTIES)
+            if (buildModelEnabled) {
+                spoofBuildModel(packageName)
+            }
+            if (localeEnabled) {
+                spoofDefaultLocale(packageName)
+            }
+            if (propertyHookNeeded) {
+                hookSystemProperties(classLoader)
+                hookJavaSystemProperties()
+            }
         }
     }
 
     private fun spoofBuildModel(packageName: String) {
-        val value = buildRules["MODEL"] ?: return
+        val value = localizerModel()
         runCatching {
             val field = Build::class.java.getDeclaredField("MODEL")
             if (field.get(null) is String && setStaticStringField(field, value)) {
@@ -165,7 +169,7 @@ object OosLocalizerHooker {
 
     private fun spoofDefaultLocale(packageName: String) {
         runCatching {
-            Locale.setDefault(Locale.SIMPLIFIED_CHINESE)
+            Locale.setDefault(Locale.forLanguageTag(localizerLocale()))
         }.onFailure { error ->
             log("spoof $packageName default locale failed: ${error.javaClass.simpleName}")
         }
@@ -203,7 +207,7 @@ object OosLocalizerHooker {
             object : XC_MethodHook() {
                 override fun beforeHookedMethod(param: MethodHookParam) {
                     val key = param.args.firstOrNull() as? String ?: return
-                    val value = propertyRules[key] ?: return
+                    val value = propertyRuleValue(key) ?: return
                     param.result = value
                 }
             }
@@ -507,8 +511,8 @@ object OosLocalizerHooker {
         val concreteKey = key ?: return null
         if (!isRecordableKey(concreteKey) || internalCallInProgress.get() == true) return null
         return when (type) {
-            "property" -> if (LspConfig.isOosLocalizerEnabledXposed()) propertyRules[concreteKey] else null
-            "build" -> if (LspConfig.isOosLocalizerEnabledXposed()) buildRules[concreteKey] else null
+            "property" -> if (LspConfig.isOosLocalizerEnabledXposed()) propertyRuleValue(concreteKey) else null
+            "build" -> if (LspConfig.isOosLocalizerEnabledXposed()) buildRuleValue(concreteKey) else null
             "app_feature_exists" -> appFeatureExistsRule(concreteKey)?.toString()
             "app_feature" -> appFeatureValueRule(concreteKey)
             else -> null
@@ -522,14 +526,107 @@ object OosLocalizerHooker {
 
     private fun appFeatureExistsRule(featureName: String): Boolean? {
         launcherRegionExistsRule(featureName)?.let { return it }
-        if (!LspConfig.isOosLocalizerEnabledXposed()) return null
-        return appFeatureExistsRules[featureName]
+        if (!LspConfig.isOosLocalizerEnabledXposed() ||
+            !LspConfig.isOosLocalizerFeatureEnabledXposed(LspConfig.OOS_LOCALIZER_FEATURE_APP_FEATURES)
+        ) return null
+        if (featureName !in appFeatureExistsRuleKeys) return null
+        return LspConfig.getOosLocalizerAppFeatureXposed(featureName)
+            ?.let(::parseBooleanValue)
     }
 
     private fun appFeatureValueRule(featureName: String): String? {
         launcherRegionValueRule(featureName)?.let { return it }
-        if (!LspConfig.isOosLocalizerEnabledXposed()) return null
-        return appFeatureValueRules[featureName]
+        if (!LspConfig.isOosLocalizerEnabledXposed() ||
+            !LspConfig.isOosLocalizerFeatureEnabledXposed(LspConfig.OOS_LOCALIZER_FEATURE_APP_FEATURES)
+        ) return null
+        return when (featureName) {
+            "com.android.launcher.REGION_NAME",
+            "com.oplus.aipaint.area" -> if (LspConfig.isOosLocalizerFeatureEnabledXposed(LspConfig.OOS_LOCALIZER_FEATURE_REGION)) {
+                "String:${localizerRegion()}"
+            } else {
+                null
+            }
+            else -> if (featureName in staticAppFeatureValueRuleKeys) {
+                LspConfig.getOosLocalizerAppFeatureXposed(featureName)
+            } else {
+                null
+            }
+        }
+    }
+
+    private fun propertyRuleValue(key: String): String? {
+        return when (key) {
+            "persist.sys.oplus.region",
+            "ro.oplus.pipeline.region",
+            "ro.vendor.oplus.regionmark",
+            "persist.sys.oppo.region",
+            "user.region",
+            "ro.vendor.oplus.version" -> if (LspConfig.isOosLocalizerFeatureEnabledXposed(LspConfig.OOS_LOCALIZER_FEATURE_REGION)) {
+                localizerRegion()
+            } else {
+                null
+            }
+            "ro.product.locale",
+            "persist.sys.locale" -> if (LspConfig.isOosLocalizerFeatureEnabledXposed(LspConfig.OOS_LOCALIZER_FEATURE_LOCALE)) {
+                localizerLocale()
+            } else {
+                null
+            }
+            "ro.product.name",
+            "ro.product.model" -> if (LspConfig.isOosLocalizerFeatureEnabledXposed(LspConfig.OOS_LOCALIZER_FEATURE_BUILD_MODEL)) {
+                localizerModel()
+            } else {
+                null
+            }
+            else -> if (LspConfig.isOosLocalizerFeatureEnabledXposed(LspConfig.OOS_LOCALIZER_FEATURE_PROPERTIES)) {
+                localizerProperty(key)
+            } else {
+                null
+            }
+        }
+    }
+
+    private fun buildRuleValue(key: String): String? {
+        return when (key) {
+            "MODEL" -> localizerModel()
+            else -> null
+        }
+    }
+
+    private fun isCustomLocalizerConfig(): Boolean {
+        return LspConfig.getOosLocalizerConfigModeXposed() == LspConfig.OOS_LOCALIZER_CONFIG_CUSTOM
+    }
+
+    private fun localizerRegion(): String {
+        return if (isCustomLocalizerConfig()) {
+            LspConfig.getOosLocalizerRegionXposed()
+        } else {
+            LspConfig.DEFAULT_OOS_LOCALIZER_REGION
+        }
+    }
+
+    private fun localizerLocale(): String {
+        return if (isCustomLocalizerConfig()) {
+            LspConfig.getOosLocalizerLocaleXposed()
+        } else {
+            LspConfig.DEFAULT_OOS_LOCALIZER_LOCALE
+        }
+    }
+
+    private fun localizerModel(): String {
+        return if (isCustomLocalizerConfig()) {
+            LspConfig.getOosLocalizerModelXposed()
+        } else {
+            LspConfig.DEFAULT_OOS_LOCALIZER_MODEL
+        }
+    }
+
+    private fun localizerProperty(key: String): String? {
+        return if (isCustomLocalizerConfig()) {
+            LspConfig.getOosLocalizerPropertyXposed(key)
+        } else {
+            staticPropertyRules[key]
+        }
     }
 
     private fun launcherRegionExistsRule(featureName: String): Boolean? {
@@ -584,7 +681,7 @@ object OosLocalizerHooker {
     private fun log(message: String) {
         internalCallInProgress.set(true)
         try {
-            XposedBridge.log("$TAG: $message")
+            HookLog.i(TAG, message)
         } finally {
             internalCallInProgress.remove()
         }

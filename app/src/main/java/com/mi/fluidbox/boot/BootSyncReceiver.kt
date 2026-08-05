@@ -1,4 +1,4 @@
-﻿package com.mi.fluidbox.boot
+package com.mi.fluidbox.boot
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -18,6 +18,7 @@ class BootSyncReceiver : BroadcastReceiver() {
         }
 
         runCatching {
+            AppLogStore.initialize(context.applicationContext)
             LspConfig.syncTogglesForBoot(context.applicationContext)
             AppLogStore.i("BootSync", "LSP toggles synced on $action")
         }.onFailure { error ->
@@ -25,4 +26,3 @@ class BootSyncReceiver : BroadcastReceiver() {
         }
     }
 }
-
