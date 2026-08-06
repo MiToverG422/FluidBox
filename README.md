@@ -29,6 +29,10 @@ FluidBox 是一个通过 ChatGPT-Codex 辅助开发的 ColorOS 系统优化/扩�
 
 - OPPO Find X9 Ultra / ColorOS 16.0.9.402
 
+## 是否支援OxygenOS/RealmeUI？
+
+- 不会主动适配，因为他们即将被ColorOS取代
+
 ## 下载
 
 前往 [Releases](https://github.com/MiToverG422/FluidBox/releases) 下载。
