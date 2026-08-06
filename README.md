@@ -32,10 +32,10 @@ FluidBox 是一个通过 Codex 辅助开发的 ColorOS 系统自定义模块。
 
 ## 感谢
 
-- [LuckyTool](https://github.com/luckyzyx/LuckyTool)
-- [YukiHookAPI](https://github.com/HighCapable/YukiHookAPI)
 - [COUI](https://github.com/suqi8/coui)
 - [OShin](https://github.com/suqi8/OShin)
+- [LuckyTool](https://github.com/luckyzyx/LuckyTool)
+- [YukiHookAPI](https://github.com/HighCapable/YukiHookAPI)
 
 ## 许可
 
