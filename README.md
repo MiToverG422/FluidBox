@@ -6,6 +6,10 @@
 
 一个 ColorOS 系统优化/扩展的 Xposed 模块
 
+<p align="center">
+  <font color="red"><strong>⚠ FluidBox 仍处于未发布正式版状态，且正在重构中，请谨慎使用！</strong></font>
+</p>
+
 ![GitHub Downloads](https://img.shields.io/github/downloads/MiToverG422/FluidBox/total?style=flat-square)
 ![GitHub Issues](https://img.shields.io/github/issues/MiToverG422/FluidBox?style=flat-square)
 ![License](https://img.shields.io/github/license/MiToverG422/FluidBox?style=flat-square)
