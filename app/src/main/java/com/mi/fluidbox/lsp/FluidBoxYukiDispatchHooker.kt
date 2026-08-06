@@ -2,15 +2,6 @@ package com.mi.fluidbox.lsp
 
 import com.highcapable.yukihookapi.hook.entity.YukiBaseHooker
 
-class FluidBoxYukiFrameworkHooker : YukiBaseHooker() {
-    override fun onHook() {
-        FrameworkHooker.hook(
-            packageName = packageName,
-            classLoader = appClassLoader
-        )
-    }
-}
-
 class FluidBoxYukiSettingsHooker : YukiBaseHooker() {
     override fun onHook() {
         val classLoader = appClassLoader ?: return

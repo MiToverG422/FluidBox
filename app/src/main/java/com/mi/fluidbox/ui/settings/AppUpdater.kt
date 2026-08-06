@@ -192,15 +192,17 @@ object AppUpdater {
         assetName: String,
     ): String? {
         val candidates = listOf(
-            tagName.removePrefix("v"),
+            tagName.removeVersionPrefix(),
             releaseName
                 .removePrefix("FluidBox CI Latest ")
-                .removePrefix("FluidBox "),
+                .removePrefix("FluidBox ")
+                .removeVersionPrefix(),
             assetName
                 .removePrefix("fluidbox-")
                 .removeSuffix(".apk")
                 .removeSuffix("-release")
-                .removeSuffix("-debug"),
+                .removeSuffix("-debug")
+                .removeVersionPrefix(),
         )
         return candidates
             .map { it.trim() }
@@ -341,25 +343,28 @@ object AppUpdater {
     private fun isNewerVersion(remote: String, current: String): Boolean {
         if (remote.isBlank()) return false
         if (remote == current) return false
-        val remoteParts = versionParts(remote)
-        val currentParts = versionParts(current)
+        val remoteVersion = ParsedVersion.parse(remote) ?: return false
+        val currentVersion = ParsedVersion.parse(current) ?: return true
+        val remoteParts = remoteVersion.parts
+        val currentParts = currentVersion.parts
         for (index in 0 until maxOf(remoteParts.size, currentParts.size)) {
             val remotePart = remoteParts.getOrElse(index) { 0 }
             val currentPart = currentParts.getOrElse(index) { 0 }
             if (remotePart != currentPart) return remotePart > currentPart
         }
-        return remote.contains("-CI-", ignoreCase = true) && remote != current
-    }
-
-    private fun versionParts(version: String): List<Int> {
-        return version
-            .substringBefore("-")
-            .split('.')
-            .mapNotNull { it.toIntOrNull() }
+        if (remoteVersion.qualifierNumber != currentVersion.qualifierNumber) {
+            return remoteVersion.qualifierNumber > currentVersion.qualifierNumber
+        }
+        if (remoteVersion.qualifierRank != currentVersion.qualifierRank) return true
+        return remoteVersion.qualifierText != currentVersion.qualifierText
     }
 
     private fun String.isComparableVersionName(): Boolean {
         return matches(VERSION_NAME_REGEX)
+    }
+
+    private fun String.removeVersionPrefix(): String {
+        return trim().replaceFirst(Regex("^v", RegexOption.IGNORE_CASE), "")
     }
 
     private fun String.ensureApkSuffix() =
@@ -373,7 +378,44 @@ object AppUpdater {
     }
 }
 
-private val VERSION_NAME_REGEX = Regex("""\d+(?:\.\d+)+(?:-CI-[A-Za-z0-9]+)?""")
+private val VERSION_NAME_REGEX = Regex("""\d+(?:\.\d+)+(?:-(?:BETA\d*|CI-[A-Za-z0-9]+))?""", RegexOption.IGNORE_CASE)
+
+private data class ParsedVersion(
+    val parts: List<Int>,
+    val qualifierRank: Int,
+    val qualifierNumber: Int,
+    val qualifierText: String,
+) {
+    companion object {
+        fun parse(version: String): ParsedVersion? {
+            val normalized = version.trim().replaceFirst(Regex("^v", RegexOption.IGNORE_CASE), "")
+            val match = VERSION_NAME_REGEX.find(normalized) ?: return null
+            val comparable = match.value
+            val base = comparable.substringBefore("-")
+            val qualifier = comparable.substringAfter("-", missingDelimiterValue = "")
+            val parts = base.split('.').mapNotNull { it.toIntOrNull() }
+            if (parts.isEmpty()) return null
+            val upperQualifier = qualifier.uppercase(Locale.ROOT)
+            val qualifierRank = when {
+                upperQualifier.startsWith("CI-") -> 1
+                upperQualifier.startsWith("BETA") -> 2
+                upperQualifier.isBlank() -> 3
+                else -> 0
+            }
+            val qualifierNumber = when {
+                upperQualifier.startsWith("BETA") ->
+                    upperQualifier.removePrefix("BETA").toIntOrNull() ?: 0
+                else -> 0
+            }
+            return ParsedVersion(
+                parts = parts,
+                qualifierRank = qualifierRank,
+                qualifierNumber = qualifierNumber,
+                qualifierText = upperQualifier,
+            )
+        }
+    }
+}
 
 enum class UpdateInstallMode {
     Interactive,

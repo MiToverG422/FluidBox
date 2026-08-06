@@ -15,15 +15,24 @@ class YukiStatusModuleEntry : IYukiHookXposedInit {
     }
 
     override fun onHook() = encase {
-        loadSystem(hooker = FluidBoxYukiFrameworkHooker())
-        loadApp(
-            name = "com.android.launcher",
-            hooker = FluidBoxYukiFrameworkHooker()
-        )
-        loadApp(
-            name = "com.oplus.aod",
-            hooker = FluidBoxYukiFrameworkHooker()
-        )
+        loadSystem {
+            FrameworkHooker.hook(
+                packageName = packageName,
+                classLoader = appClassLoader
+            )
+        }
+        loadApp(name = "com.android.launcher") {
+            FrameworkHooker.hook(
+                packageName = packageName,
+                classLoader = appClassLoader
+            )
+        }
+        loadApp(name = "com.oplus.aod") {
+            FrameworkHooker.hook(
+                packageName = packageName,
+                classLoader = appClassLoader
+            )
+        }
         loadApp(name = "com.android.settings", hooker = FluidBoxYukiSettingsHooker())
         loadApp(*OosLocalizerHooker.supportedPackageNames.toTypedArray()) {
             OosLocalizerHooker.hook(
