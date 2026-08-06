@@ -254,6 +254,10 @@ jobs:
           release_thread_id = os.environ.get("TG_RELEASE_THREAD_ID", "").strip()
           build_status = os.environ.get("BUILD_STATUS", "unknown").lower()
           channel = os.environ.get("BUILD_CHANNEL", "ci").lower()
+          if build_status != "success":
+              print(f"Build status is {build_status}; skip Telegram notification.")
+              raise SystemExit(0)
+
           repo = os.environ.get("GITHUB_REPOSITORY", "")
           branch = os.environ.get("GITHUB_REF_NAME", "")
           full_sha = os.environ.get("GITHUB_SHA", "")
@@ -371,14 +375,44 @@ jobs:
 
           dist = Path("dist")
           release_apk = next(iter(sorted(dist.glob("*-release.apk"))), None)
-          can_upload_apk = (
-              build_status == "success"
-              and release_apk is not None
-              and release_apk.is_file()
-              and release_apk.stat().st_size <= max_size
-          )
+          debug_apk = next(iter(sorted(dist.glob("*-debug.apk"))), None)
 
-          if can_upload_apk:
+          def can_upload(path: Path | None) -> bool:
+              return path is not None and path.is_file() and path.stat().st_size <= max_size
+
+          if build_status == "success" and can_upload(release_apk) and can_upload(debug_apk):
+              media = [
+                  {
+                      "type": "document",
+                      "media": "attach://apk0",
+                      "caption": msg,
+                      "parse_mode": "HTML",
+                  },
+                  {
+                      "type": "document",
+                      "media": "attach://apk1",
+                  },
+              ]
+              fields = {
+                  "chat_id": chat_id,
+                  "media": json.dumps(media, ensure_ascii=False),
+              }
+              if thread_id:
+                  fields["message_thread_id"] = thread_id
+              status, text = api_post(
+                  "sendMediaGroup",
+                  fields,
+                  files=[
+                      ("apk0", (release_apk.name, "application/octet-stream", release_apk.read_bytes())),
+                      ("apk1", (debug_apk.name, "application/octet-stream", debug_apk.read_bytes())),
+                  ],
+              )
+              if is_ok(status, text):
+                  raise SystemExit(0)
+              print("Telegram APK media group upload failed, fallback to single APK or text message:")
+              print((text or "unknown error")[:800])
+
+          if build_status == "success" and can_upload(release_apk):
               fields = {
                   "chat_id": chat_id,
                   "caption": msg,
@@ -393,7 +427,7 @@ jobs:
               )
               if is_ok(status, text):
                   raise SystemExit(0)
-              print("Telegram APK upload failed, fallback to text message:")
+              print("Telegram release APK upload failed, fallback to text message:")
               print((text or "unknown error")[:800])
 
           fields = {
