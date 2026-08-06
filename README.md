@@ -7,7 +7,7 @@
 一个 ColorOS 系统优化/扩展的 Xposed 模块
 
 <p align="center">
-  <font color="red"><strong>⚠ FluidBox 仍处于未发布正式版状态，且正在重构中，请谨慎使用！</strong></font>
+  <strong style="color: red;">⚠ FluidBox 仍处于未发布正式版状态，且正在重构中，请谨慎使用！</strong>
 </p>
 
 ![GitHub Downloads](https://img.shields.io/github/downloads/MiToverG422/FluidBox/total?style=flat-square)
