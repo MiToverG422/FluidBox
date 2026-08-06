@@ -27,8 +27,8 @@ FluidBox 是一个通过 ChatGPT-Codex 辅助开发的 ColorOS 系统优化/扩�
 
 ## Q&A
 
-**是否支援 OxygenOS / Realme UI？**  
-未来不会主动适配，因为它们即将被 ColorOS 取代。
+**Q:是否支援 OxygenOS / RealmeUI？**  
+A:未来不会主动适配，因为它们即将被 ColorOS 取代。
 
 ## 测试机型
 
