@@ -352,10 +352,14 @@ object AppUpdater {
             val currentPart = currentParts.getOrElse(index) { 0 }
             if (remotePart != currentPart) return remotePart > currentPart
         }
-        if (remoteVersion.qualifierNumber != currentVersion.qualifierNumber) {
-            return remoteVersion.qualifierNumber > currentVersion.qualifierNumber
+        for (index in 0 until maxOf(remoteVersion.qualifierParts.size, currentVersion.qualifierParts.size)) {
+            val remotePart = remoteVersion.qualifierParts.getOrElse(index) { 0 }
+            val currentPart = currentVersion.qualifierParts.getOrElse(index) { 0 }
+            if (remotePart != currentPart) return remotePart > currentPart
         }
-        if (remoteVersion.qualifierRank != currentVersion.qualifierRank) return true
+        if (remoteVersion.qualifierRank != currentVersion.qualifierRank) {
+            return remoteVersion.qualifierRank > currentVersion.qualifierRank
+        }
         return remoteVersion.qualifierText != currentVersion.qualifierText
     }
 
@@ -378,12 +382,13 @@ object AppUpdater {
     }
 }
 
-private val VERSION_NAME_REGEX = Regex("""\d+(?:\.\d+)+(?:-(?:BETA\d*|CI-[A-Za-z0-9]+))?""", RegexOption.IGNORE_CASE)
+private val VERSION_NAME_REGEX =
+    Regex("""\d+(?:\.\d+)+(?:-(?:BETA(?:\d+(?:\.\d+)*)?|CI-[A-Za-z0-9]+))?""", RegexOption.IGNORE_CASE)
 
 private data class ParsedVersion(
     val parts: List<Int>,
     val qualifierRank: Int,
-    val qualifierNumber: Int,
+    val qualifierParts: List<Int>,
     val qualifierText: String,
 ) {
     companion object {
@@ -402,15 +407,20 @@ private data class ParsedVersion(
                 upperQualifier.isBlank() -> 3
                 else -> 0
             }
-            val qualifierNumber = when {
+            val qualifierParts = when {
                 upperQualifier.startsWith("BETA") ->
-                    upperQualifier.removePrefix("BETA").toIntOrNull() ?: 0
-                else -> 0
+                    upperQualifier
+                        .removePrefix("BETA")
+                        .takeIf { it.isNotBlank() }
+                        ?.split('.')
+                        ?.mapNotNull { it.toIntOrNull() }
+                        .orEmpty()
+                else -> emptyList()
             }
             return ParsedVersion(
                 parts = parts,
                 qualifierRank = qualifierRank,
-                qualifierNumber = qualifierNumber,
+                qualifierParts = qualifierParts,
                 qualifierText = upperQualifier,
             )
         }
