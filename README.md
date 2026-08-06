@@ -7,7 +7,6 @@
 一个 ColorOS 系统优化/扩展的 Xposed 模块
 
 ![GitHub Downloads](https://img.shields.io/github/downloads/MiToverG422/FluidBox/total?style=flat-square)
-![GitHub Stars](https://img.shields.io/github/stars/MiToverG422/FluidBox?style=flat-square)
 ![GitHub Issues](https://img.shields.io/github/issues/MiToverG422/FluidBox?style=flat-square)
 ![License](https://img.shields.io/github/license/MiToverG422/FluidBox?style=flat-square)
 
@@ -31,7 +30,7 @@ FluidBox 是一个通过 ChatGPT-Codex 辅助开发的 ColorOS 系统优化/扩�
 A:未来不会主动适配，因为它们即将被 ColorOS 取代。
 
 **Q:是否支援旧版 ColorOS？**  
-A:不会，仅支援 ColorOS 16。
+A:不会，仅支援最新的 ColorOS 16。
 
 **Q:是否所有功能都能正常使用？**  
 A:不保证。不同设备、系统版本、区域版本可能存在差异。
