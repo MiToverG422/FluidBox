@@ -220,9 +220,7 @@ private fun HomeInfoBasicRow(
     label: String,
     value: String,
 ) {
-    BasicComponent(
-        insideMargin = SettingsTokens.BasicComponentInsideMargin,
-    ) {
+    BasicComponent {
         SettingsRowTextContent(
             title = label,
             summary = value,

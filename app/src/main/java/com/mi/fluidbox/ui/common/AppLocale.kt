@@ -9,10 +9,7 @@ object AppLocale {
     const val LANGUAGE_SYSTEM = ""
     const val LANGUAGE_EN = "en"
     const val LANGUAGE_ZH_CN = "zh-CN"
-    const val LANGUAGE_ZH_HK = "zh-HK"
-    const val LANGUAGE_ZH_MO = "zh-MO"
     const val LANGUAGE_ZH_TW = "zh-TW"
-    const val LANGUAGE_YUE_HANT = "yue-Hant"
 
     private const val PREFS_NAME = "fluidbox_prefs"
     private const val KEY_APP_LANGUAGE = "app_language"
@@ -22,12 +19,16 @@ object AppLocale {
             .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getString(KEY_APP_LANGUAGE, LANGUAGE_SYSTEM)
             .orEmpty()
+            .normalizeLanguageTag()
             .takeIf { it in supportedLanguageTags }
             ?: LANGUAGE_SYSTEM
     }
 
     fun setSelectedLanguageTag(context: Context, languageTag: String) {
-        val normalizedTag = languageTag.takeIf { it in supportedLanguageTags } ?: LANGUAGE_SYSTEM
+        val normalizedTag = languageTag
+            .normalizeLanguageTag()
+            .takeIf { it in supportedLanguageTags }
+            ?: LANGUAGE_SYSTEM
         context
             .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
@@ -54,9 +55,13 @@ object AppLocale {
         LANGUAGE_SYSTEM,
         LANGUAGE_EN,
         LANGUAGE_ZH_CN,
-        LANGUAGE_ZH_HK,
-        LANGUAGE_ZH_MO,
         LANGUAGE_ZH_TW,
-        LANGUAGE_YUE_HANT
     )
+
+    private fun String.normalizeLanguageTag(): String {
+        return when (this) {
+            "zh-HK", "zh-MO", "yue-Hant" -> LANGUAGE_ZH_TW
+            else -> this
+        }
+    }
 }

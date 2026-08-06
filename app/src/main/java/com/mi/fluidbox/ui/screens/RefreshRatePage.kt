@@ -6,16 +6,17 @@ import android.os.Build
 import android.view.Display
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,6 +52,7 @@ import com.mi.fluidbox.ui.settings.SettingsDivider
 import com.mi.fluidbox.ui.settings.SettingsTokens
 import com.mi.fluidbox.ui.settings.SettingsToggleRow
 import com.mi.fluidbox.ui.settings.settingsInteractiveRowHighlight
+import io.github.suqi8.coui.kmp.basic.BasicComponent
 import io.github.suqi8.coui.kmp.basic.ButtonDefaults
 import io.github.suqi8.coui.kmp.basic.Icon
 import io.github.suqi8.coui.kmp.basic.RadioButton
@@ -87,6 +89,8 @@ private const val KEY_AUTO_START_ENABLED = "auto_start_enabled"
 private const val KEY_CACHED_DISPLAY_MODES = "cached_display_modes"
 private val RefreshRateTableContentPaddingStart = 16.dp
 private val RefreshRateTableContentPaddingEnd = 8.dp
+private val RefreshRateTableRowMinHeight = 48.dp
+private val RefreshRateTableRowVerticalPadding = 6.dp
 
 @Composable
 fun RefreshRatePage(
@@ -183,8 +187,6 @@ fun RefreshRatePage(
                 text = stringResource(R.string.refresh_rate_no_modes),
                 style = COUITheme.textStyles.body1,
                 color = COUITheme.colorScheme.onSurfaceVariantSummary,
-                fontSize = SettingsTokens.RowSummaryFontSize,
-                lineHeight = SettingsTokens.RowSummaryLineHeight,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
             )
         }
@@ -287,67 +289,60 @@ private fun RefreshRateModeHeader(
     hasDividerBelow: Boolean,
     onClick: () -> Unit,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
     val hapticClick = rememberHapticClick()
-    val rowHighlightColor = COUITheme.colorScheme.onSurface.copy(alpha = 0.08f)
-    val arrowRotation by animateFloatAsState(
-        targetValue = if (expanded) -90f else 0f,
-        animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
-        label = "refresh_rate_header_arrow_rotation",
-    )
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(SettingsTokens.RowHeight)
-            .settingsInteractiveRowHighlight(
-                interactionSource = interactionSource,
-                color = rowHighlightColor,
-                hasDividerAbove = false,
-                hasDividerBelow = hasDividerBelow,
-            )
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = {
-                    hapticClick()
-                    onClick()
-                },
-            )
-            .padding(
-                start = RefreshRateTableContentPaddingStart,
-                end = RefreshRateTableContentPaddingEnd,
-            ),
-        verticalAlignment = Alignment.CenterVertically,
+    BasicComponent(
+        insideMargin = PaddingValues(
+            start = RefreshRateTableContentPaddingStart,
+            end = RefreshRateTableContentPaddingEnd,
+        ),
+        endActions = {
+            RefreshRateExpandArrow(expanded = expanded)
+        },
+        onClick = {
+            hapticClick()
+            onClick()
+        },
+        role = Role.Button,
     ) {
-        RefreshRateHeaderText(
-            text = stringResource(R.string.refresh_rate_table_id),
-            modifier = Modifier.width(42.dp),
-        )
-        RefreshRateHeaderText(
-            text = stringResource(R.string.refresh_rate_table_resolution),
-            modifier = Modifier.width(124.dp),
-        )
-        RefreshRateHeaderText(
-            text = stringResource(R.string.refresh_rate_table_refresh_rate),
-            modifier = Modifier
-                .weight(1f)
-                .padding(end = 12.dp),
-        )
-        Box(
-            modifier = Modifier
-                .size(20.dp)
-                .graphicsLayer(rotationZ = arrowRotation),
-            contentAlignment = Alignment.Center,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = COUIIcons.ChevronForward,
-                contentDescription = null,
-                tint = COUITheme.colorScheme.onSurfaceVariantActions,
-                modifier = Modifier.size(width = 10.dp, height = 16.dp),
+            RefreshRateHeaderText(
+                text = stringResource(R.string.refresh_rate_table_id),
+                modifier = Modifier.width(42.dp),
+            )
+            RefreshRateHeaderText(
+                text = stringResource(R.string.refresh_rate_table_resolution),
+                modifier = Modifier.width(124.dp),
+            )
+            RefreshRateHeaderText(
+                text = stringResource(R.string.refresh_rate_table_refresh_rate),
+                modifier = Modifier.weight(1f),
             )
         }
     }
 }
+
+@Composable
+private fun RefreshRateExpandArrow(
+    expanded: Boolean,
+) {
+    val rotationZ by animateFloatAsState(
+        targetValue = if (expanded) -90f else 0f,
+        animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
+        label = "refreshRateExpandArrowRotation",
+    )
+    Icon(
+        imageVector = COUIIcons.ChevronForward,
+        contentDescription = null,
+        tint = COUITheme.colorScheme.onSurfaceVariantActions,
+        modifier = Modifier
+            .size(width = 12.dp, height = 24.dp)
+            .graphicsLayer(rotationZ = rotationZ),
+    )
+}
+
 @Composable
 private fun RefreshRateHeaderText(
     text: String,
@@ -355,11 +350,9 @@ private fun RefreshRateHeaderText(
 ) {
     Text(
         text = text,
-        style = COUITheme.textStyles.title3,
+        fontSize = COUITheme.textStyles.headline1.fontSize,
         color = COUITheme.colorScheme.onSurface,
         fontWeight = FontWeight.Medium,
-        fontSize = SettingsTokens.RowTitleFontSize,
-        lineHeight = SettingsTokens.RowTitleLineHeight,
         modifier = modifier,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
@@ -380,7 +373,6 @@ private fun RefreshRateModeRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(SettingsTokens.RowHeight)
             .settingsInteractiveRowHighlight(
                 interactionSource = interactionSource,
                 color = rowHighlightColor,
@@ -396,40 +388,37 @@ private fun RefreshRateModeRow(
                     onClick()
                 },
             )
+            .heightIn(min = RefreshRateTableRowMinHeight)
             .padding(
                 start = RefreshRateTableContentPaddingStart,
                 end = RefreshRateTableContentPaddingEnd,
+                top = RefreshRateTableRowVerticalPadding,
+                bottom = RefreshRateTableRowVerticalPadding,
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = mode.surfaceFlingerModeIndex.toString(),
-            style = COUITheme.textStyles.title3,
+            fontSize = COUITheme.textStyles.headline1.fontSize,
             color = COUITheme.colorScheme.onSurface,
             fontWeight = FontWeight.Medium,
-            fontSize = SettingsTokens.RowTitleFontSize,
-            lineHeight = SettingsTokens.RowTitleLineHeight,
             modifier = Modifier.width(42.dp),
             maxLines = 1,
         )
         Text(
             text = stringResource(R.string.refresh_rate_resolution_format, mode.width, mode.height),
-            style = COUITheme.textStyles.title3,
+            fontSize = COUITheme.textStyles.headline1.fontSize,
             color = COUITheme.colorScheme.onSurface,
             fontWeight = FontWeight.Medium,
-            fontSize = SettingsTokens.RowTitleFontSize,
-            lineHeight = SettingsTokens.RowTitleLineHeight,
             modifier = Modifier.width(124.dp),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
         Text(
             text = formatRefreshRate(mode.refreshRate),
-            style = COUITheme.textStyles.title3,
+            fontSize = COUITheme.textStyles.headline1.fontSize,
             color = COUITheme.colorScheme.onSurface,
             fontWeight = FontWeight.Medium,
-            fontSize = SettingsTokens.RowTitleFontSize,
-            lineHeight = SettingsTokens.RowTitleLineHeight,
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 12.dp),

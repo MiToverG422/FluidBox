@@ -35,7 +35,6 @@ fun SettingsThemeModeDropdown(
         items = labels,
         selectedIndex = selectedIndex,
         title = title,
-        insideMargin = SettingsTokens.BasicComponentInsideMargin,
         onSelectedIndexChange = { index ->
             modes.getOrNull(index)?.let(onModeChange)
         },

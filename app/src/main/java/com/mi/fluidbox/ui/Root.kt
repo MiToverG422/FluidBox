@@ -123,9 +123,7 @@ import com.mi.fluidbox.ui.common.AppIcons
 import com.mi.fluidbox.ui.common.AssistantScreenOption
 import com.mi.fluidbox.ui.common.BottomTab
 import com.mi.fluidbox.ui.common.FpsMonitorOverlay
-import com.mi.fluidbox.ui.common.LocalColorOsHapticFeedbackEnabled
 import com.mi.fluidbox.ui.common.bottomTabs
-import com.mi.fluidbox.ui.common.LocalHapticFeedbackEnabled
 import com.mi.fluidbox.ui.common.readCachedRootAccessInfo
 import com.mi.fluidbox.ui.common.rememberHapticClick
 import com.kyant.backdrop.backdrops.LayerBackdrop as LiquidLayerBackdrop
@@ -421,10 +419,6 @@ private fun AboutPageMode.toRootRoute(): RootRoute? = when (this) {
 private data class RootUiState(
     val currentTab: Int,
     val rootGranted: Boolean,
-    val showChinaSpecialFeatures: Boolean,
-    val showGlobalSpecialFeatures: Boolean,
-    val hapticFeedbackEnabled: Boolean,
-    val hapticFeedbackPlusEnabled: Boolean,
     val blurEffectEnabled: Boolean,
     val popDirectionFollowsSwipeEdge: Boolean,
     val showFpsMonitor: Boolean,
@@ -478,10 +472,6 @@ private data class RootUiState(
 @Stable
 private data class RootActions(
     val onTabChange: (Int) -> Unit,
-    val onShowChinaSpecialFeaturesChange: (Boolean) -> Unit,
-    val onShowGlobalSpecialFeaturesChange: (Boolean) -> Unit,
-    val onHapticFeedbackEnabledChange: (Boolean) -> Unit,
-    val onHapticFeedbackPlusEnabledChange: (Boolean) -> Unit,
     val onBlurEffectEnabledChange: (Boolean) -> Unit,
     val onPopDirectionFollowsSwipeEdgeChange: (Boolean) -> Unit,
     val onShowFpsMonitorChange: (Boolean) -> Unit,
@@ -556,8 +546,6 @@ private fun RootFeatureEntry(pageMode: FeaturePageMode) {
     FeatureSubRoute(
         modifier = Modifier.fillMaxSize(),
         pageMode = pageMode,
-        showChinaSpecialFeatures = ui.showChinaSpecialFeatures,
-        showGlobalSpecialFeatures = ui.showGlobalSpecialFeatures,
         oosLocalizerEnabled = ui.oosLocalizerEnabled,
         onOosLocalizerEnabledChange = actions.onOosLocalizerEnabledChange,
         oosLocalizerConfigMode = ui.oosLocalizerConfigMode,
@@ -637,14 +625,6 @@ private fun RootAboutEntry(pageMode: AboutPageMode) {
         modifier = Modifier.fillMaxSize(),
         pageMode = pageMode,
         softwareUpdateState = ui.softwareUpdateState,
-        showChinaSpecialFeatures = ui.showChinaSpecialFeatures,
-        onShowChinaSpecialFeaturesChange = actions.onShowChinaSpecialFeaturesChange,
-        showGlobalSpecialFeatures = ui.showGlobalSpecialFeatures,
-        onShowGlobalSpecialFeaturesChange = actions.onShowGlobalSpecialFeaturesChange,
-        hapticFeedbackEnabled = ui.hapticFeedbackEnabled,
-        onHapticFeedbackEnabledChange = actions.onHapticFeedbackEnabledChange,
-        hapticFeedbackPlusEnabled = ui.hapticFeedbackPlusEnabled,
-        onHapticFeedbackPlusEnabledChange = actions.onHapticFeedbackPlusEnabledChange,
         blurEffectEnabled = ui.blurEffectEnabled,
         onBlurEffectEnabledChange = actions.onBlurEffectEnabledChange,
         popDirectionFollowsSwipeEdge = ui.popDirectionFollowsSwipeEdge,
@@ -680,14 +660,6 @@ fun Root(
     currentTab: Int,
     onTabChange: (Int) -> Unit,
     rootGranted: Boolean,
-    showChinaSpecialFeatures: Boolean,
-    onShowChinaSpecialFeaturesChange: (Boolean) -> Unit,
-    showGlobalSpecialFeatures: Boolean,
-    onShowGlobalSpecialFeaturesChange: (Boolean) -> Unit,
-    hapticFeedbackEnabled: Boolean,
-    onHapticFeedbackEnabledChange: (Boolean) -> Unit,
-    hapticFeedbackPlusEnabled: Boolean,
-    onHapticFeedbackPlusEnabledChange: (Boolean) -> Unit,
     blurEffectEnabled: Boolean,
     onBlurEffectEnabledChange: (Boolean) -> Unit,
     popDirectionFollowsSwipeEdge: Boolean,
@@ -786,10 +758,6 @@ fun Root(
         )
     }
     COUITheme(controller = themeController) {
-        CompositionLocalProvider(
-            LocalHapticFeedbackEnabled provides hapticFeedbackEnabled,
-            LocalColorOsHapticFeedbackEnabled provides hapticFeedbackPlusEnabled,
-        ) {
         val colors = COUITheme.colorScheme
         val blurBackdrop = rememberChromeBlurBackdrop(blurEffectEnabled)
         val liquidBottomBarSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
@@ -901,10 +869,6 @@ fun Root(
         val rootUiState = RootUiState(
             currentTab = currentTab,
             rootGranted = rootGranted,
-            showChinaSpecialFeatures = showChinaSpecialFeatures,
-            showGlobalSpecialFeatures = showGlobalSpecialFeatures,
-            hapticFeedbackEnabled = hapticFeedbackEnabled,
-            hapticFeedbackPlusEnabled = hapticFeedbackPlusEnabled,
             blurEffectEnabled = blurEffectEnabled,
             popDirectionFollowsSwipeEdge = popDirectionFollowsSwipeEdge,
             showFpsMonitor = showFpsMonitor,
@@ -956,10 +920,6 @@ fun Root(
         )
         val rootActions = RootActions(
             onTabChange = onTabChange,
-            onShowChinaSpecialFeaturesChange = onShowChinaSpecialFeaturesChange,
-            onShowGlobalSpecialFeaturesChange = onShowGlobalSpecialFeaturesChange,
-            onHapticFeedbackEnabledChange = onHapticFeedbackEnabledChange,
-            onHapticFeedbackPlusEnabledChange = onHapticFeedbackPlusEnabledChange,
             onBlurEffectEnabledChange = onBlurEffectEnabledChange,
             onPopDirectionFollowsSwipeEdgeChange = onPopDirectionFollowsSwipeEdgeChange,
             onShowFpsMonitorChange = onShowFpsMonitorChange,
@@ -1116,8 +1076,6 @@ fun Root(
                                     when (targetTab) {
                                         1 -> FeatureMainRoute(
                                             modifier = Modifier.fillMaxSize(),
-                                            showChinaSpecialFeatures = ui.showChinaSpecialFeatures,
-                                            showGlobalSpecialFeatures = ui.showGlobalSpecialFeatures,
                                             subPageBottomExtension = ui.bottomNavigationHeight,
                                             blurBackdrop = ui.blurBackdrop,
                                             onOpen = actions.openFeatureSubPage,
@@ -1250,7 +1208,6 @@ fun Root(
                     )
                 }
             }
-        }
         }
     }
 }

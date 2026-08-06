@@ -39,7 +39,6 @@ fun SettingsThemeKeyColorDropdown(
         items = labels,
         selectedIndex = selectedIndex,
         title = title,
-        insideMargin = SettingsTokens.BasicComponentInsideMargin,
         onSelectedIndexChange = { index ->
             onKeyColorChange(themeKeyColorOptions.getOrNull(index)?.argb)
         },
@@ -59,7 +58,6 @@ fun SettingsThemeTextDropdown(
         items = labels,
         selectedIndex = selectedIndex.coerceIn(labels.indices),
         title = title,
-        insideMargin = SettingsTokens.BasicComponentInsideMargin,
         onSelectedIndexChange = onSelectedIndexChange,
     )
 }

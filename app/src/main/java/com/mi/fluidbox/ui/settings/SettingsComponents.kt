@@ -5,9 +5,9 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.os.Build
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -98,10 +98,11 @@ import io.github.suqi8.coui.kmp.basic.PopupPositionProvider
 import io.github.suqi8.coui.kmp.basic.Switch
 import io.github.suqi8.coui.kmp.basic.Text
 import io.github.suqi8.coui.kmp.basic.COUIScrollBehavior
-import io.github.suqi8.coui.kmp.icon.COUIIcons
-import io.github.suqi8.coui.kmp.icon.extended.ChevronForward
 import io.github.suqi8.coui.kmp.icon.extended.Ok
 import io.github.suqi8.coui.kmp.icon.extended.Back
+import io.github.suqi8.coui.kmp.icon.COUIIcons
+import io.github.suqi8.coui.kmp.icon.extended.ChevronForward
+import io.github.suqi8.coui.kmp.preference.ArrowPreference
 import io.github.suqi8.coui.kmp.theme.COUITheme
 import io.github.suqi8.coui.kmp.theme.darkColorScheme
 import io.github.suqi8.coui.kmp.theme.lightColorScheme
@@ -135,27 +136,6 @@ fun SettingsGroup(content: @Composable ColumnScope.() -> Unit) {
 }
 
 internal object SettingsTokens {
-    // Preference row inner padding: affects SettingsCardRow, SettingsToggleRow,
-    // WindowDropdownPreference wrappers, and custom rows that derive RowHeight.
-    val BasicComponentInsideMargin = PaddingValues(horizontal = 16.dp, vertical = 10.dp)
-    // Main row title text size: SettingsCardRow titles and custom table row primary text.
-    val RowTitleFontSize = 16.sp
-    // Main row summary text size: SettingsCardRow summaries and custom secondary text.
-    val RowSummaryFontSize = 13.sp
-    // Main row title line height, paired with RowTitleFontSize.
-    val RowTitleLineHeight = 22.sp
-    // Main row summary line height, paired with RowSummaryFontSize.
-    val RowSummaryLineHeight = 18.sp
-    // Minimum height for custom rows that cannot use COUI BasicComponent directly.
-    val RowHeight = (
-        20.dp +
-            BasicComponentInsideMargin.calculateTopPadding() +
-            BasicComponentInsideMargin.calculateBottomPadding()
-        ).coerceAtLeast(48.dp)
-    // Vertical padding for custom rows that contain both title and summary.
-    val RowWithSummaryVerticalPadding = 6.dp
-    // Gap between SettingsCardRow title and summary.
-    val RowTitleSummarySpacing = 2.dp
     // Press highlight inset around dividers.
     val DividerVerticalPadding = 6.dp
     // Settings divider thickness.
@@ -276,54 +256,53 @@ fun SettingsCardRow(
         return
     }
 
-    val expandArrowRotation by animateFloatAsState(
-        targetValue = if (expandArrowExpanded) -90f else 0f,
-        animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
-        label = "settingsExpandArrowRotation",
-    )
     val rowSummary = summary.takeIf { it.isNotBlank() }
     val startAction = leadingContent?.let { content: @Composable () -> Unit ->
         @Composable { content() }
     }
 
     when {
-        showArrow -> BasicComponent(
+        showArrow -> ArrowPreference(
+            title = title,
+            summary = rowSummary,
             startAction = startAction,
-            endActions = {
-                SettingsRowChevron()
-            },
-            insideMargin = SettingsTokens.BasicComponentInsideMargin,
             onClick = onClick,
-        ) {
-            SettingsRowTextContent(
-                title = title,
-                summary = rowSummary,
-            )
-        }
+        )
         showExpandArrow -> BasicComponent(
+            title = title,
+            summary = rowSummary,
             startAction = startAction,
             endActions = {
-                SettingsRowChevron(rotationZ = expandArrowRotation)
+                SettingsExpandArrow(expanded = expandArrowExpanded)
             },
-            insideMargin = SettingsTokens.BasicComponentInsideMargin,
             onClick = onClick,
-        ) {
-            SettingsRowTextContent(
-                title = title,
-                summary = rowSummary,
-            )
-        }
+        )
         else -> BasicComponent(
+            title = title,
+            summary = rowSummary,
             startAction = startAction,
-            insideMargin = SettingsTokens.BasicComponentInsideMargin,
             onClick = onClick,
-        ) {
-            SettingsRowTextContent(
-                title = title,
-                summary = rowSummary,
-            )
-        }
+        )
     }
+}
+
+@Composable
+private fun SettingsExpandArrow(
+    expanded: Boolean,
+) {
+    val rotationZ by animateFloatAsState(
+        targetValue = if (expanded) -90f else 0f,
+        animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
+        label = "settingsExpandArrowRotation",
+    )
+    Icon(
+        imageVector = COUIIcons.ChevronForward,
+        contentDescription = null,
+        tint = COUITheme.colorScheme.onSurfaceVariantActions,
+        modifier = Modifier
+            .size(24.dp)
+            .graphicsLayer(rotationZ = rotationZ),
+    )
 }
 
 @Composable
@@ -334,8 +313,7 @@ internal fun SettingsRowTextContent(
 ) {
     Text(
         text = title,
-        fontSize = SettingsTokens.RowTitleFontSize,
-        lineHeight = SettingsTokens.RowTitleLineHeight,
+        fontSize = COUITheme.textStyles.headline1.fontSize,
         fontWeight = FontWeight.Medium,
         color = if (enabled) {
             COUITheme.colorScheme.onBackground
@@ -346,9 +324,8 @@ internal fun SettingsRowTextContent(
     if (summary != null) {
         Text(
             text = summary,
-            modifier = Modifier.padding(top = SettingsTokens.RowTitleSummarySpacing),
-            fontSize = SettingsTokens.RowSummaryFontSize,
-            lineHeight = SettingsTokens.RowSummaryLineHeight,
+            modifier = Modifier.padding(top = 2.dp),
+            fontSize = COUITheme.textStyles.body2.fontSize,
             color = if (enabled) {
                 COUITheme.colorScheme.onSurfaceVariantSummary
             } else {
@@ -356,18 +333,4 @@ internal fun SettingsRowTextContent(
             },
         )
     }
-}
-
-@Composable
-private fun SettingsRowChevron(
-    rotationZ: Float = 0f,
-) {
-    Icon(
-        imageVector = COUIIcons.ChevronForward,
-        contentDescription = null,
-        tint = COUITheme.colorScheme.onSurfaceVariantActions,
-        modifier = Modifier
-            .size(width = 12.dp, height = 24.dp)
-            .graphicsLayer(rotationZ = rotationZ),
-    )
 }

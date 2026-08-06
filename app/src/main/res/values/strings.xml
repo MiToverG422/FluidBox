@@ -63,8 +63,7 @@
     <string name="language_system">Follow system</string>
     <string name="language_english">English</string>
     <string name="language_simplified_chinese">Simplified Chinese</string>
-    <string name="language_traditional_chinese_hk">Traditional Chinese (Hong Kong)</string>
-    <string name="language_traditional_chinese_tw">Traditional Chinese (Taiwan)</string>
+    <string name="language_traditional_chinese_tw">正体中文</string>
 
 
 <string name="setting_blur_effect">Enable Blur Effect</string>
@@ -79,10 +78,6 @@
     <string name="setting_one_china_principle_summary">Replace Taiwan region text and flag with a version that follows the One China principle</string>
 
 
-<string name="setting_show_cn_special_features">Show China mainland special features</string>
-    <string name="setting_show_cn_special_features_summary">Show features intended for ColorOS CN systems</string>
-    <string name="setting_show_global_special_features">Show global special features</string>
-    <string name="setting_show_global_special_features_summary">Show features intended for OxygenOS and ColorOS Global systems</string>
     <string name="section_restore_backup">Restore and backup</string>
     <string name="setting_export_config">Export config</string>
     <string name="setting_export_config_summary">Save current app configuration to a file</string>
@@ -109,7 +104,7 @@
     <string name="feature_native_notification_bubbles_summary">Force-enable Android conversation bubbles in framework, ColorOS CN only, Requires system restart</string>
     <string name="feature_force_native_clipboard_overlay_title">Native clipboard</string>
     <string name="feature_force_native_clipboard_overlay_summary">Force-enable the bottom-left native clipboard entry</string>
-    <string name="feature_group_beautify">Beautify</string>
+    <string name="feature_group_beautify">Status bar</string>
     <string name="feature_status_mobile_type_title">Mobile network signal icon</string>
     <string name="feature_status_mobile_type_summary">Adjust 5G icon position and visibility rules</string>
     <string name="feature_status_mobile_type_hide_data_off_title">Hide when mobile data is off</string>
@@ -265,7 +260,7 @@
 
 <string name="about_codex_author_summary">Development assistance</string>
     <string name="about_codex_author_title">Codex</string>
-    <string name="about_contributor_colorlaris_summary">about_contributor_colorlaris_summary</string>
+    <string name="about_contributor_colorlaris_summary">GitHub@Colorlaris\nCoolapk@Colorlaris</string>
     <string name="about_contributor_colorlaris_title">Colorlaris</string>
     <string name="about_contributors_title">Contributors</string>
     <string name="about_description">A COUI-style toolbox for OPlus system customization</string>
@@ -328,8 +323,6 @@
     <string name="home_status_root_missing">Root access not granted</string>
 
 
-<string name="language_traditional_chinese_cantonese">繁體中文（粵語）</string>
-    <string name="language_traditional_chinese_mo">繁體中文（澳門）</string>
 
 <string name="log_level_debug">Debug</string>
     <string name="log_level_error">Error</string>
@@ -337,16 +330,12 @@
     <string name="log_level_warn">Warn</string>
     <string name="log_search_placeholder">Search logs</string>
     <string name="lsp_status_module_disabled">Module is not enabled in LSPosed</string>
-    <string name="setting_haptic_feedback">Haptic feedback Plus</string>
-    <string name="setting_haptic_feedback_plus">ColorOS-style vibration</string>
-    <string name="setting_haptic_feedback_plus_summary">Haptic feedback based on ColorOS personalization logic</string>
     <string name="setting_auto_silent_update">Automatic silent updates</string>
     <string name="setting_auto_silent_update_summary">Automatically checks and downloads the latest version in the background, then silently installs it when possible</string>
     <string name="setting_software_update">Software update</string>
 
 
 <string name="settings_section_display">Display</string>
-    <string name="settings_section_haptics">Haptics</string>
 
 
 <string name="update_channel_github_ci">GitHub CI</string>

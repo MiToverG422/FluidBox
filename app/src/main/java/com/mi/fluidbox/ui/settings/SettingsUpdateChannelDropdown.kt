@@ -94,7 +94,6 @@ fun SettingsUpdateChannelDropdown(
         items = channels.map { it.second },
         selectedIndex = selectedIndex,
         title = title,
-        insideMargin = SettingsTokens.BasicComponentInsideMargin,
         onSelectedIndexChange = { index ->
             val channel = channels.getOrNull(index)?.first ?: return@SettingsWindowDropdownPreference
             if (onChannelChange != null) {

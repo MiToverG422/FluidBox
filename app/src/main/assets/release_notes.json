@@ -1,6 +1,0 @@
-{
-  "16.0(1)": {
-    "zh-CN": "1. 新增软件更新页面，支持检查更新、更新设置和更新说明。\n\n2. 优化关于页结构，将软件更新和日志入口迁移到关于页。\n\n3. 调整页面动画、底栏显示和部分 COUI 风格细节。",
-    "default": "1. Added the software update page with update checks, update settings, and release notes.\n\n2. Improved the About page structure by moving software update and logs into About.\n\n3. Refined page transitions, bottom navigation behavior, and COUI-style details."
-  }
-}

@@ -40,7 +40,6 @@ import com.mi.fluidbox.ui.common.queryPermissionMonitorVisibility
 import com.mi.fluidbox.ui.common.queryRootAccess
 import com.mi.fluidbox.ui.Root
 import com.mi.fluidbox.ui.settings.AppUpdater
-import java.util.Locale
 
 private data class StartupRefreshState(
     val lspSnapshot: LspConfig.UiSnapshot,
@@ -52,11 +51,6 @@ private data class StartupRefreshState(
 
 class MainActivity : ComponentActivity() {
     private companion object {
-        const val PREF_SPECIAL_FEATURE_VISIBILITY_INITIALIZED = "special_feature_visibility_initialized"
-        const val PREF_SHOW_CN_SPECIAL_FEATURES = "show_cn_special_features"
-        const val PREF_SHOW_GLOBAL_SPECIAL_FEATURES = "show_global_special_features"
-        const val PREF_HAPTIC_FEEDBACK_ENABLED = "haptic_feedback_enabled"
-        const val PREF_HAPTIC_FEEDBACK_PLUS_ENABLED = "haptic_feedback_plus_enabled"
         const val PREF_BLUR_EFFECT_ENABLED = "blur_effect_enabled"
         const val PREF_POP_DIRECTION_FOLLOWS_SWIPE_EDGE = "pop_direction_follows_swipe_edge"
         const val PREF_SHOW_FPS_MONITOR = "show_fps_monitor"
@@ -86,18 +80,6 @@ class MainActivity : ComponentActivity() {
             val rootCheckScope = rememberCoroutineScope()
             var firstLaunchChecksPassed by rememberSaveable {
                 mutableStateOf(prefs.getBoolean("first_launch_root_granted", false))
-            }
-            var showChinaSpecialFeatures by rememberSaveable {
-                mutableStateOf(prefs.getBoolean(PREF_SHOW_CN_SPECIAL_FEATURES, false))
-            }
-            var showGlobalSpecialFeatures by rememberSaveable {
-                mutableStateOf(prefs.getBoolean(PREF_SHOW_GLOBAL_SPECIAL_FEATURES, false))
-            }
-            var hapticFeedbackEnabled by rememberSaveable {
-                mutableStateOf(prefs.getBoolean(PREF_HAPTIC_FEEDBACK_ENABLED, false))
-            }
-            var hapticFeedbackPlusEnabled by rememberSaveable {
-                mutableStateOf(prefs.getBoolean(PREF_HAPTIC_FEEDBACK_PLUS_ENABLED, true))
             }
             var blurEffectEnabled by rememberSaveable {
                 mutableStateOf(prefs.getBoolean(PREF_BLUR_EFFECT_ENABLED, false))
@@ -276,18 +258,6 @@ class MainActivity : ComponentActivity() {
                 withContext(Dispatchers.IO) {
                     AppLogStore.initialize(applicationContext)
                 }
-                if (!prefs.getBoolean(PREF_SPECIAL_FEATURE_VISIBILITY_INITIALIZED, false)) {
-                    val isChinaMainland = withContext(Dispatchers.IO) {
-                        detectRegionCode() == "CN"
-                    }
-                    prefs.edit()
-                        .putBoolean(PREF_SHOW_CN_SPECIAL_FEATURES, isChinaMainland)
-                        .putBoolean(PREF_SHOW_GLOBAL_SPECIAL_FEATURES, !isChinaMainland)
-                        .putBoolean(PREF_SPECIAL_FEATURE_VISIBILITY_INITIALIZED, true)
-                        .apply()
-                    showChinaSpecialFeatures = isChinaMainland
-                    showGlobalSpecialFeatures = !isChinaMainland
-                }
                 AppLogStore.i("App", "MainActivity started")
                 delay(1_200)
                 val startupState = withContext(Dispatchers.IO) {
@@ -349,34 +319,6 @@ class MainActivity : ComponentActivity() {
                 onDispose {
                     lifecycle.removeObserver(observer)
                 }
-            }
-            LaunchedEffect(showChinaSpecialFeatures) {
-                if (!settingsEffectsReady) return@LaunchedEffect
-                prefs.edit()
-                    .putBoolean(PREF_SHOW_CN_SPECIAL_FEATURES, showChinaSpecialFeatures)
-                    .apply()
-                AppLogStore.i("Settings", "Show China special features: $showChinaSpecialFeatures")
-            }
-            LaunchedEffect(showGlobalSpecialFeatures) {
-                if (!settingsEffectsReady) return@LaunchedEffect
-                prefs.edit()
-                    .putBoolean(PREF_SHOW_GLOBAL_SPECIAL_FEATURES, showGlobalSpecialFeatures)
-                    .apply()
-                AppLogStore.i("Settings", "Show global special features: $showGlobalSpecialFeatures")
-            }
-            LaunchedEffect(hapticFeedbackEnabled) {
-                if (!settingsEffectsReady) return@LaunchedEffect
-                prefs.edit()
-                    .putBoolean(PREF_HAPTIC_FEEDBACK_ENABLED, hapticFeedbackEnabled)
-                    .apply()
-                AppLogStore.i("Settings", "Haptic feedback: $hapticFeedbackEnabled")
-            }
-            LaunchedEffect(hapticFeedbackPlusEnabled) {
-                if (!settingsEffectsReady) return@LaunchedEffect
-                prefs.edit()
-                    .putBoolean(PREF_HAPTIC_FEEDBACK_PLUS_ENABLED, hapticFeedbackPlusEnabled)
-                    .apply()
-                AppLogStore.i("Settings", "ColorOS-style vibration: $hapticFeedbackPlusEnabled")
             }
             LaunchedEffect(blurEffectEnabled) {
                 if (!settingsEffectsReady) return@LaunchedEffect
@@ -685,24 +627,6 @@ class MainActivity : ComponentActivity() {
                 currentTab = currentTab,
                 onTabChange = { currentTab = it },
                 rootGranted = firstLaunchChecksPassed,
-                showChinaSpecialFeatures = showChinaSpecialFeatures,
-                onShowChinaSpecialFeaturesChange = { showChinaSpecialFeatures = it },
-                showGlobalSpecialFeatures = showGlobalSpecialFeatures,
-                onShowGlobalSpecialFeaturesChange = { showGlobalSpecialFeatures = it },
-                hapticFeedbackEnabled = hapticFeedbackEnabled,
-                onHapticFeedbackEnabledChange = { enabled ->
-                    hapticFeedbackEnabled = enabled
-                    if (enabled) {
-                        hapticFeedbackPlusEnabled = false
-                    }
-                },
-                hapticFeedbackPlusEnabled = hapticFeedbackPlusEnabled,
-                onHapticFeedbackPlusEnabledChange = { enabled ->
-                    hapticFeedbackPlusEnabled = enabled
-                    if (enabled) {
-                        hapticFeedbackEnabled = false
-                    }
-                },
                 blurEffectEnabled = blurEffectEnabled,
                 onBlurEffectEnabledChange = { blurEffectEnabled = it },
                 popDirectionFollowsSwipeEdge = popDirectionFollowsSwipeEdge,
@@ -849,54 +773,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun detectRegionCode(): String {
-        val propertyRegion = listOf(
-            "ro.oplus.regionmark",
-            "ro.oplus.region",
-            "ro.vendor.oplus.regionmark",
-            "persist.sys.oplus.region",
-            "ro.product.locale.region"
-        ).asSequence()
-            .mapNotNull(::readSystemProperty)
-            .map(String::trim)
-            .firstOrNull { it.isNotEmpty() }
-            ?.let(::normalizeRegionCode)
-
-        if (propertyRegion != null) {
-            return propertyRegion
-        }
-
-        return resources.configuration.locales[0]
-            .country
-            .ifBlank { "XX" }
-            .uppercase(Locale.ROOT)
-    }
-
-    private fun normalizeRegionCode(raw: String): String? {
-        val normalized = raw
-            .replace('-', '_')
-            .substringAfterLast('_')
-            .uppercase(Locale.ROOT)
-
-        val mapped = when (normalized) {
-            "INDIA" -> "IN"
-            "CHINA" -> "CN"
-            "HONGKONG", "HONG_KONG" -> "HK"
-            "TAIWAN" -> "TW"
-            "GLOBAL", "ROW", "WW", "EUEX" -> "GLO"
-            else -> normalized
-        }
-
-        return mapped.takeIf { it.length in 2..3 && it.all { ch -> ch in 'A'..'Z' } }
-    }
-
-    private fun readSystemProperty(key: String): String? {
-        return runCatching {
-            val cls = Class.forName("android.os.SystemProperties")
-            val getMethod = cls.getMethod("get", String::class.java, String::class.java)
-            (getMethod.invoke(null, key, "") as? String)
-                ?.trim()
-                ?.takeIf { it.isNotEmpty() }
-        }.getOrNull()
-    }
 }

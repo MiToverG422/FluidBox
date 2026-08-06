@@ -1,7 +1,5 @@
 package com.mi.fluidbox.ui.settings
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,6 +18,7 @@ fun SettingsToggleRow(
     hasDividerAbove: Boolean = false,
     hasDividerBelow: Boolean = false,
     enabled: Boolean = true,
+    bottomAction: (@Composable () -> Unit)? = null,
 ) {
     SettingsSwitchPreference(
         checked = checked,
@@ -36,7 +35,7 @@ fun SettingsToggleRow(
             )
             }
         },
-        insideMargin = SettingsTokens.BasicComponentInsideMargin,
         enabled = enabled,
+        bottomAction = bottomAction,
     )
 }

@@ -28,6 +28,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -558,6 +559,18 @@ fun SoftwareUpdatePage(
     val versionName = rememberAppVersionName()
     val versionCode = rememberAppVersionCode()
     val deviceMarketName = rememberDeviceMarketName()
+    val isLightTheme = COUITheme.colorScheme.background.luminance() > 0.5f
+    val updateCardContentColor = if (isLightTheme) {
+        COUITheme.colorScheme.onSurface
+    } else {
+        Color(0xFFECECEC)
+    }
+    val updateCardNumberSecondaryColor = if (isLightTheme) {
+        Color(0xFF202020)
+    } else {
+        Color(0xFFE8E8E8)
+    }
+    val updateCardShape = RoundedCornerShape(28.dp)
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -568,7 +581,18 @@ fun SoftwareUpdatePage(
                 .fillMaxWidth()
                 .padding(horizontal = SoftwareUpdateContentHorizontalPadding)
                 .aspectRatio(0.65f)
-                .clip(RoundedCornerShape(28.dp)),
+                .clip(updateCardShape)
+                .then(
+                    if (isLightTheme) {
+                        Modifier.border(
+                            width = 0.5.dp,
+                            color = COUITheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                            shape = updateCardShape,
+                        )
+                    } else {
+                        Modifier
+                    },
+                ),
         ) {
             Image(
                 painter = painterResource(R.drawable.software_update_wave_bg),
@@ -592,7 +616,7 @@ fun SoftwareUpdatePage(
                     lineHeight = 125.sp)
                 SoftwareUpdateCardNumberText(
                     text = "6",
-                    color = Color(0xFFE8E8E8),
+                    color = updateCardNumberSecondaryColor,
                     fontSize = 125.sp,
                     lineHeight = 125.sp,
                 )
@@ -606,7 +630,7 @@ fun SoftwareUpdatePage(
                 Text(
                     text = state.statusText,
                     style = COUITheme.textStyles.title2,
-                    color = Color(0xFFECECEC),
+                    color = updateCardContentColor,
                     fontWeight = FontWeight.Medium,
                     fontSize = 20.sp,
                     lineHeight = 28.sp,
@@ -614,7 +638,7 @@ fun SoftwareUpdatePage(
                 if (state.checkingUpdates) {
                     Spacer(modifier = Modifier.width(6.dp))
                     SoftwareUpdateLoadingIndicator(
-                        color = Color(0xFFECECEC),
+                        color = updateCardContentColor,
                         size = 16.dp,
                         strokeWidth = 0.5.dp,
                         modifier = Modifier.align(Alignment.CenterVertically),
@@ -622,7 +646,7 @@ fun SoftwareUpdatePage(
                 }
             }
             FluidBoxLogo(
-                color = Color(0xFFECECEC),
+                color = updateCardContentColor,
                 fontSize = 32.sp,
                 lineHeight = 38.sp,
                 modifier = Modifier
@@ -632,7 +656,7 @@ fun SoftwareUpdatePage(
             Text(
                 text = deviceMarketName,
                 style = COUITheme.textStyles.title3,
-                color = Color(0xFFECECEC),
+                color = updateCardContentColor,
                 fontWeight = FontWeight.Medium,
                 fontSize = 12.sp,
                 lineHeight = 20.sp,
@@ -1432,14 +1456,6 @@ private fun openUrl(context: Context, url: String) {
 
 @Composable
 fun AppSettingsPage(
-    showChinaSpecialFeatures: Boolean,
-    onShowChinaSpecialFeaturesChange: (Boolean) -> Unit,
-    showGlobalSpecialFeatures: Boolean,
-    onShowGlobalSpecialFeaturesChange: (Boolean) -> Unit,
-    hapticFeedbackEnabled: Boolean,
-    onHapticFeedbackEnabledChange: (Boolean) -> Unit,
-    hapticFeedbackPlusEnabled: Boolean,
-    onHapticFeedbackPlusEnabledChange: (Boolean) -> Unit,
     blurEffectEnabled: Boolean,
     onBlurEffectEnabledChange: (Boolean) -> Unit,
     appLanguageTag: String,
@@ -1581,11 +1597,8 @@ fun AppSettingsPage(
             hasDividerAbove = true,
             hasDividerBelow = true,
             trailing = when (appLanguageTag) {
-                "zh-CN" -> stringResource(R.string.language_simplified_chinese)
-                "zh-TW" -> stringResource(R.string.language_traditional_chinese_tw)
-                "zh-HK" -> stringResource(R.string.language_traditional_chinese_hk)
-                "zh-MO" -> stringResource(R.string.language_traditional_chinese_mo)
-                "yue-Hant" -> stringResource(R.string.language_traditional_chinese_cantonese)
+                "zh-CN" -> "简体中文"
+                "zh-TW" -> "正體中文"
                 "en" -> "English"
                 else -> stringResource(R.string.language_system)
             },
@@ -1632,45 +1645,6 @@ fun AppSettingsPage(
             checked = oneChinaPrincipleEnabled,
             onCheckedChange = onOneChinaPrincipleEnabledChange,
             hasDividerAbove = true,
-            hasDividerBelow = true,
-        )
-        SettingsDivider()
-        SettingsToggleRow(
-            title = stringResource(R.string.setting_show_cn_special_features),
-            summary = stringResource(R.string.setting_show_cn_special_features_summary),
-            checked = showChinaSpecialFeatures,
-            onCheckedChange = onShowChinaSpecialFeaturesChange,
-            hasDividerAbove = true,
-            hasDividerBelow = true,
-        )
-        SettingsDivider()
-        SettingsToggleRow(
-            title = stringResource(R.string.setting_show_global_special_features),
-            summary = stringResource(R.string.setting_show_global_special_features_summary),
-            checked = showGlobalSpecialFeatures,
-            onCheckedChange = onShowGlobalSpecialFeaturesChange,
-            hasDividerAbove = true,
-        )
-    }
-
-    SettingsSection(title = stringResource(R.string.settings_section_haptics))
-    SettingsGroup {
-        SettingsToggleRow(
-            title = stringResource(R.string.setting_haptic_feedback),
-            summary = "",
-            checked = hapticFeedbackEnabled,
-            onCheckedChange = onHapticFeedbackEnabledChange,
-            hasDividerAbove = false,
-            hasDividerBelow = true,
-        )
-        SettingsDivider()
-        SettingsToggleRow(
-            title = stringResource(R.string.setting_haptic_feedback_plus),
-            summary = stringResource(R.string.setting_haptic_feedback_plus_summary),
-            checked = hapticFeedbackPlusEnabled,
-            onCheckedChange = onHapticFeedbackPlusEnabledChange,
-            hasDividerAbove = true,
-            hasDividerBelow = false,
         )
     }
 

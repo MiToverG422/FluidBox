@@ -48,14 +48,9 @@
     <string name="language_system">跟随系统</string>
     <string name="language_english">英语</string>
     <string name="language_simplified_chinese">简体中文</string>
-    <string name="language_traditional_chinese_hk">繁体中文（香港）</string>
-    <string name="language_traditional_chinese_tw">繁体中文（台湾）</string>
+    <string name="language_traditional_chinese_tw">正体中文</string>
 
 
-<string name="setting_show_cn_special_features">显示中国大陆版特殊功能</string>
-    <string name="setting_show_cn_special_features_summary">显示适用于 ColorOS CN 系统的功能入口</string>
-    <string name="setting_show_global_special_features">显示国际版特殊功能</string>
-    <string name="setting_show_global_special_features_summary">显示适用于 OxygenOS 和 ColorOS Global 系统的功能入口</string>
     <string name="section_restore_backup">恢复与备份</string>
     <string name="setting_export_config">导出配置</string>
     <string name="setting_export_config_summary">将当前应用配置保存到文件</string>
@@ -191,7 +186,7 @@
     <string name="setting_liquid_glass_bottom_bar_summary">使用 Apple 风格的 LiquidGlass 底栏，需要Android13+</string>
     <string name="setting_one_china_principle">一个中国原则</string>
     <string name="setting_one_china_principle_summary">将台湾地区相关文本和旗帜替换为符合一个中国原则的版本</string>
-    <string name="feature_group_beautify">美化</string>
+    <string name="feature_group_beautify">状态栏</string>
     <string name="feature_status_mobile_type_title">移动网络信号图标</string>
     <string name="feature_status_mobile_type_summary">修改 5G 图标的位置与隐藏逻辑</string>
     <string name="feature_status_mobile_type_hide_data_off_title">移动数据关闭时隐藏</string>
@@ -266,7 +261,7 @@
 
 <string name="about_codex_author_summary">开发协助</string>
     <string name="about_codex_author_title">Codex</string>
-    <string name="about_contributor_colorlaris_summary">GitHub@Colorlaris\n哔哩哔哩@Colorlaris</string>
+    <string name="about_contributor_colorlaris_summary">GitHub@Colorlaris\n酷安@Colorlaris</string>
     <string name="about_contributor_colorlaris_title">Colorlaris</string>
     <string name="about_contributors_title">贡献人员</string>
     <string name="about_description">一个 COUI 风格的 OPlus 系统自定义工具箱</string>
@@ -329,8 +324,6 @@
     <string name="home_status_root_missing">未授予 Root 权限</string>
 
 
-<string name="language_traditional_chinese_cantonese">繁体中文（粤语）</string>
-    <string name="language_traditional_chinese_mo">繁体中文（澳门）</string>
 
 <string name="log_level_debug">调试</string>
     <string name="log_level_error">错误</string>
@@ -338,16 +331,12 @@
     <string name="log_level_warn">警告</string>
     <string name="log_search_placeholder">搜索日志</string>
     <string name="lsp_status_module_disabled">未在 LSPosed 启用模块</string>
-    <string name="setting_haptic_feedback">触控反馈Plus</string>
-    <string name="setting_haptic_feedback_plus">ColorOS式震动</string>
-    <string name="setting_haptic_feedback_plus_summary">根据ColorOS系统个性化逻辑的制作的震动反馈</string>
     <string name="setting_auto_silent_update">自动静默更新</string>
     <string name="setting_auto_silent_update_summary">在后台自动检查并下载最新版本，下载完成后静默安装</string>
     <string name="setting_software_update">软件更新</string>
 
 
 <string name="settings_section_display">显示</string>
-    <string name="settings_section_haptics">触觉</string>
 
 
 <string name="update_channel_github_ci">GitHub CI</string>

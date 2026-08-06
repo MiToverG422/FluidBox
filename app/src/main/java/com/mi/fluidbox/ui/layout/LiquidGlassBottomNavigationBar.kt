@@ -44,6 +44,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -210,11 +212,20 @@ fun LiquidGlassBottomNavigationBar(
                     )
                     BasicText(
                         text = stringResource(tab.titleRes),
-                        style = TextStyle(color = contentColor, fontSize = 12.sp),
-                        modifier = Modifier.graphicsLayer {
-                            scaleX = contentScale
-                            scaleY = contentScale
-                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .graphicsLayer {
+                                scaleX = contentScale
+                                scaleY = contentScale
+                            },
+                        style = TextStyle(
+                            color = contentColor,
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
+                        ),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        softWrap = false,
                     )
                 }
             }

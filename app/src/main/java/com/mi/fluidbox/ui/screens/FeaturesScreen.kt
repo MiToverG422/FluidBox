@@ -121,8 +121,6 @@ enum class FeaturePageMode {
 @Composable
 fun FeatureMainRoute(
     modifier: Modifier,
-    showChinaSpecialFeatures: Boolean,
-    showGlobalSpecialFeatures: Boolean,
     subPageBottomExtension: Dp,
     blurBackdrop: LayerBackdrop?,
     onOpen: (FeaturePageMode) -> Unit,
@@ -134,8 +132,6 @@ fun FeatureMainRoute(
         modifier = modifier.fillMaxSize(),
     ) {
         FeatureMainPage(
-            showChinaSpecialFeatures = showChinaSpecialFeatures,
-            showGlobalSpecialFeatures = showGlobalSpecialFeatures,
             onOpen = onOpen,
         )
     }
@@ -145,8 +141,6 @@ fun FeatureMainRoute(
 fun FeatureSubRoute(
     modifier: Modifier,
     pageMode: FeaturePageMode,
-    showChinaSpecialFeatures: Boolean,
-    showGlobalSpecialFeatures: Boolean,
     oosLocalizerEnabled: Boolean,
     onOosLocalizerEnabledChange: (Boolean) -> Unit,
     oosLocalizerConfigMode: Int,
@@ -307,8 +301,6 @@ fun FeatureSubRoute(
             }
             FeatureSubPage(
                 mode = pageMode,
-                showChinaSpecialFeatures = showChinaSpecialFeatures,
-                showGlobalSpecialFeatures = showGlobalSpecialFeatures,
                 oosLocalizerEnabled = oosLocalizerEnabled,
                 onOosLocalizerEnabledChange = onOosLocalizerEnabledChange,
                 oosLocalizerConfigMode = oosLocalizerConfigMode,
@@ -498,8 +490,6 @@ private fun FeatureRestartActionButton(
 
 @Composable
 private fun FeatureMainPage(
-    showChinaSpecialFeatures: Boolean,
-    showGlobalSpecialFeatures: Boolean,
     onOpen: (FeaturePageMode) -> Unit,
 ) {
     val entries = buildList {
@@ -539,38 +529,34 @@ private fun FeatureMainPage(
                 pageMode = FeaturePageMode.Aod,
             )
         )
-        if (showChinaSpecialFeatures) {
-            add(
-                FeatureMainEntry(
-                    titleRes = R.string.feature_assistant_title,
-                    summaryRes = R.string.feature_assistant_summary,
-                    icon = AppIcons.Extension,
-                    iconPackages = listOf(
-                        "com.heytap.speechassist",
-                        "com.coloros.speechassist",
-                        "com.oplus.speechassist",
-                        "com.google.android.googlequicksearchbox",
-                    ),
-                    pageMode = FeaturePageMode.Assistant,
-                )
+        add(
+            FeatureMainEntry(
+                titleRes = R.string.feature_assistant_title,
+                summaryRes = R.string.feature_assistant_summary,
+                icon = AppIcons.Extension,
+                iconPackages = listOf(
+                    "com.heytap.speechassist",
+                    "com.coloros.speechassist",
+                    "com.oplus.speechassist",
+                    "com.google.android.googlequicksearchbox",
+                ),
+                pageMode = FeaturePageMode.Assistant,
             )
-        }
-        if (showGlobalSpecialFeatures) {
-            add(
-                FeatureMainEntry(
-                    titleRes = R.string.feature_oos_localizer_title,
-                    summaryRes = R.string.feature_oos_localizer_home_summary,
-                    icon = AppIcons.Extension,
-                    iconPackages = listOf(
-                        "com.oplus.aimemory",
-                        "com.oplus.appplatform",
-                        "com.oplus.exsystemservice",
-                        "com.android.settings",
-                    ),
-                    pageMode = FeaturePageMode.OPlusLocalizer,
-                )
+        )
+        add(
+            FeatureMainEntry(
+                titleRes = R.string.feature_oos_localizer_title,
+                summaryRes = R.string.feature_oos_localizer_home_summary,
+                icon = AppIcons.Extension,
+                iconPackages = listOf(
+                    "com.oplus.aimemory",
+                    "com.oplus.appplatform",
+                    "com.oplus.exsystemservice",
+                    "com.android.settings",
+                ),
+                pageMode = FeaturePageMode.OPlusLocalizer,
             )
-        }
+        )
     }
 
     SettingsGroup {
@@ -602,8 +588,6 @@ private data class FeatureMainEntry(
 @Composable
 private fun FeatureSubPage(
     mode: FeaturePageMode,
-    showChinaSpecialFeatures: Boolean,
-    showGlobalSpecialFeatures: Boolean,
     oosLocalizerEnabled: Boolean,
     onOosLocalizerEnabledChange: (Boolean) -> Unit,
     oosLocalizerConfigMode: Int,
@@ -677,7 +661,6 @@ private fun FeatureSubPage(
 ) {
     when (mode) {
         FeaturePageMode.Desktop -> DesktopFeaturesPage(
-            showGlobalSpecialFeatures = showGlobalSpecialFeatures,
             launcherLayoutUnlocked = launcherLayoutUnlocked,
             onLauncherLayoutUnlockedChange = onLauncherLayoutUnlockedChange,
             assistantScreenOption = assistantScreenOption,
@@ -690,7 +673,6 @@ private fun FeatureSubPage(
             onRecentTaskRadiusDpChange = onRecentTaskRadiusDpChange,
         )
         FeaturePageMode.SystemUi -> SystemUiFeaturesPage(
-            showChinaSpecialFeatures = showChinaSpecialFeatures,
             nativeNotifyIconEnabled = nativeNotifyIconEnabled,
             onNativeNotifyIconEnabledChange = onNativeNotifyIconEnabledChange,
             nativeNotificationBubblesEnabled = nativeNotificationBubblesEnabled,
@@ -772,7 +754,6 @@ private fun FeatureSubPage(
 
 @Composable
 private fun DesktopFeaturesPage(
-    showGlobalSpecialFeatures: Boolean,
     launcherLayoutUnlocked: Boolean,
     onLauncherLayoutUnlockedChange: (Boolean) -> Unit,
     assistantScreenOption: AssistantScreenOption,
@@ -784,18 +765,16 @@ private fun DesktopFeaturesPage(
     recentTaskRadiusDp: Int,
     onRecentTaskRadiusDpChange: (Int) -> Unit,
 ) {
-    if (showGlobalSpecialFeatures) {
-        SettingsSection(title = stringResource(R.string.feature_group_minus_one))
-        SettingsGroup {
-            AssistantScreenRow(
-                title = stringResource(R.string.event_page_tool_title),
-                summary = stringResource(R.string.event_page_tool_summary),
-                selectedOption = assistantScreenOption,
-                onOptionChange = onAssistantScreenOptionChange,
-                hasDividerAbove = false,
-                hasDividerBelow = false,
-            )
-        }
+    SettingsSection(title = stringResource(R.string.feature_group_minus_one))
+    SettingsGroup {
+        AssistantScreenRow(
+            title = stringResource(R.string.event_page_tool_title),
+            summary = stringResource(R.string.event_page_tool_summary),
+            selectedOption = assistantScreenOption,
+            onOptionChange = onAssistantScreenOptionChange,
+            hasDividerAbove = false,
+            hasDividerBelow = false,
+        )
     }
 
     SettingsSection(title = stringResource(R.string.feature_group_region))
@@ -910,7 +889,6 @@ private fun <T> OptionDropdownRow(
         summary = summary.takeIf { it.isNotBlank() },
         items = options.map { it.second },
         selectedIndex = selectedIndex,
-        insideMargin = SettingsTokens.BasicComponentInsideMargin,
         onSelectedIndexChange = { index ->
             options.getOrNull(index)?.first?.let(onValueChange)
         },
@@ -928,56 +906,55 @@ private fun RecentTaskRadiusRow(
     hasDividerAbove: Boolean,
 ) {
     val hapticTick = rememberColorOsHapticTick()
-    Column {
-        SettingsToggleRow(
-            title = title,
-            summary = summary,
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            hasDividerAbove = hasDividerAbove,
-            hasDividerBelow = checked,
-        )
-        AnimatedVisibility(
-            visible = checked,
-            enter = expandVertically(animationSpec = tween(180, easing = FastOutSlowInEasing)),
-            exit = shrinkVertically(animationSpec = tween(180, easing = FastOutSlowInEasing)),
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp),
+    SettingsToggleRow(
+        title = title,
+        summary = summary,
+        checked = checked,
+        onCheckedChange = onCheckedChange,
+        hasDividerAbove = hasDividerAbove,
+        hasDividerBelow = checked,
+        bottomAction = {
+            AnimatedVisibility(
+                visible = checked,
+                enter = expandVertically(animationSpec = tween(180, easing = FastOutSlowInEasing)),
+                exit = shrinkVertically(animationSpec = tween(180, easing = FastOutSlowInEasing)),
             ) {
-                SettingsDivider()
-                Text(
-                    text = stringResource(R.string.feature_slider_current_dp, valueDp),
-                    style = COUITheme.textStyles.body1,
-                    color = COUITheme.colorScheme.onSurfaceVariantSummary,
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                )
-                Slider(
-                    value = valueDp.toFloat(),
-                    onValueChange = { next ->
-                        val nextValue = next.toInt()
-                        if (nextValue != valueDp) {
-                            hapticTick()
-                            onValueDpChange(nextValue)
-                        }
-                    },
-                    valueRange = 0f..260f,
-                    steps = 259,
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                )
+                        .padding(bottom = 12.dp),
+                ) {
+                    SettingsDivider()
+                    Text(
+                        text = stringResource(R.string.feature_slider_current_dp, valueDp),
+                        style = COUITheme.textStyles.body1,
+                        color = COUITheme.colorScheme.onSurfaceVariantSummary,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                    )
+                    Slider(
+                        value = valueDp.toFloat(),
+                        onValueChange = { next ->
+                            val nextValue = next.toInt()
+                            if (nextValue != valueDp) {
+                                hapticTick()
+                                onValueDpChange(nextValue)
+                            }
+                        },
+                        valueRange = 0f..260f,
+                        steps = 259,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                    )
+                }
             }
-        }
-    }
+        },
+    )
 }
 
 @Composable
 private fun SystemUiFeaturesPage(
-    showChinaSpecialFeatures: Boolean,
     nativeNotifyIconEnabled: Boolean,
     onNativeNotifyIconEnabledChange: (Boolean) -> Unit,
     nativeNotificationBubblesEnabled: Boolean,
@@ -1008,17 +985,15 @@ private fun SystemUiFeaturesPage(
             onCheckedChange = onNativeNotifyIconEnabledChange,
             hasDividerBelow = true,
         )
-        if (showChinaSpecialFeatures) {
-            SettingsDivider()
-            SettingsToggleRow(
-                title = stringResource(R.string.feature_native_notification_bubbles_title),
-                summary = stringResource(R.string.feature_native_notification_bubbles_summary),
-                checked = nativeNotificationBubblesEnabled,
-                onCheckedChange = onNativeNotificationBubblesEnabledChange,
-                hasDividerAbove = true,
-                hasDividerBelow = true,
-            )
-        }
+        SettingsDivider()
+        SettingsToggleRow(
+            title = stringResource(R.string.feature_native_notification_bubbles_title),
+            summary = stringResource(R.string.feature_native_notification_bubbles_summary),
+            checked = nativeNotificationBubblesEnabled,
+            onCheckedChange = onNativeNotificationBubblesEnabledChange,
+            hasDividerAbove = true,
+            hasDividerBelow = true,
+        )
         SettingsDivider()
         SettingsToggleRow(
             title = stringResource(R.string.feature_force_native_clipboard_overlay_title),
@@ -1410,7 +1385,6 @@ private fun OosLocalizerConfigModeCard(
     hasDividerBelow: Boolean = false,
 ) {
     BasicComponent(
-        insideMargin = SettingsTokens.BasicComponentInsideMargin,
         onClick = onClick,
         endActions = {
             RadioButton(
@@ -1838,7 +1812,6 @@ private fun LocalizerTextFieldRow(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = SettingsTokens.RowHeight)
             .settingsInteractiveRowHighlight(
                 interactionSource = remember { MutableInteractionSource() },
                 color = COUITheme.colorScheme.onSurface.copy(alpha = 0.08f),
@@ -1851,8 +1824,6 @@ private fun LocalizerTextFieldRow(
             text = title,
             style = COUITheme.textStyles.body1,
             color = COUITheme.colorScheme.onSurfaceVariantSummary,
-            fontSize = SettingsTokens.RowSummaryFontSize,
-            lineHeight = SettingsTokens.RowSummaryLineHeight,
             modifier = Modifier.padding(top = 8.dp),
         )
         Spacer(modifier = Modifier.height(4.dp))

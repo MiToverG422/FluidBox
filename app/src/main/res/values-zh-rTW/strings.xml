@@ -48,14 +48,9 @@
     <string name="language_system">跟隨系統</string>
     <string name="language_english">英文</string>
     <string name="language_simplified_chinese">簡體中文</string>
-    <string name="language_traditional_chinese_hk">繁體中文（香港）</string>
-    <string name="language_traditional_chinese_tw">繁體中文（台灣）</string>
+    <string name="language_traditional_chinese_tw">正體中文</string>
 
 
-<string name="setting_show_cn_special_features">顯示中國大陸版特殊功能</string>
-    <string name="setting_show_cn_special_features_summary">顯示適用於 ColorOS CN 系統的功能入口</string>
-    <string name="setting_show_global_special_features">顯示國際版特殊功能</string>
-    <string name="setting_show_global_special_features_summary">顯示適用於 OxygenOS 和 ColorOS Global 系統的功能入口</string>
     <string name="section_restore_backup">還原與備份</string>
     <string name="setting_export_config">匯出設定</string>
     <string name="setting_export_config_summary">將目前應用程式設定儲存至檔案</string>
@@ -191,7 +186,7 @@
     <string name="setting_liquid_glass_bottom_bar_summary">使用 Apple 風格的 LiquidGlass 底欄，需要 Android 13+</string>
     <string name="setting_one_china_principle">一個中國原則</string>
     <string name="setting_one_china_principle_summary">將台灣地區相關文字和旗幟替換為符合一個中國原則的版本</string>
-    <string name="feature_group_beautify">美化</string>
+    <string name="feature_group_beautify">狀態列</string>
     <string name="feature_status_mobile_type_title">顯示中國大陸版特殊功能</string>
     <string name="feature_status_mobile_type_summary">顯示适用于 ColorOS CN 系統的功能入口</string>
     <string name="feature_status_mobile_type_hide_data_off_title">隱藏未開流量圖標</string>
@@ -266,7 +261,7 @@
 
 <string name="about_codex_author_summary">開發協助</string>
     <string name="about_codex_author_title">Codex</string>
-    <string name="about_contributor_colorlaris_summary">GitHub@Colorlaris\n哔哩哔哩@Colorlaris</string>
+    <string name="about_contributor_colorlaris_summary">GitHub@Colorlaris\n酷安@Colorlaris</string>
     <string name="about_contributor_colorlaris_title">Colorlaris</string>
     <string name="about_contributors_title">貢獻人員</string>
     <string name="about_description">一個 COUI 風格的 OPlus 系統自訂工具箱</string>
@@ -329,8 +324,6 @@
     <string name="home_status_root_missing">未授予 Root 權限</string>
 
 
-<string name="language_traditional_chinese_cantonese">繁體中文（粵語）</string>
-    <string name="language_traditional_chinese_mo">繁體中文（澳門）</string>
 
 <string name="log_level_debug">偵錯</string>
     <string name="log_level_error">錯誤</string>
@@ -338,16 +331,12 @@
     <string name="log_level_warn">警告</string>
     <string name="log_search_placeholder">搜尋日誌</string>
     <string name="lsp_status_module_disabled">未在 LSPosed 啟用模組</string>
-    <string name="setting_haptic_feedback">觸控回饋Plus</string>
-    <string name="setting_haptic_feedback_plus">ColorOS 式震動</string>
-    <string name="setting_haptic_feedback_plus_summary">根據 ColorOS 系統個人化邏輯製作的震動回饋</string>
     <string name="setting_auto_silent_update">自動靜默更新</string>
     <string name="setting_auto_silent_update_summary">在後台自動檢查并下載最新版本，下載完成後靜默安裝</string>
     <string name="setting_software_update">軟件更新</string>
 
 
 <string name="settings_section_display">顯示</string>
-    <string name="settings_section_haptics">觸覺</string>
 
 
 <string name="update_channel_github_ci">GitHub CI</string>

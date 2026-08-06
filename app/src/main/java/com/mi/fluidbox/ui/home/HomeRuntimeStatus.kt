@@ -25,7 +25,6 @@ import com.mi.fluidbox.lsp.LsposedScopeRequester
 import com.mi.fluidbox.ui.common.readCachedRootAccessInfo
 import com.mi.fluidbox.ui.common.rememberHapticClick
 import io.github.suqi8.coui.kmp.basic.Card
-import io.github.suqi8.coui.kmp.basic.CardDefaults
 import io.github.suqi8.coui.kmp.basic.Text
 import io.github.suqi8.coui.kmp.theme.COUITheme
 import kotlinx.coroutines.Dispatchers
@@ -135,10 +134,6 @@ private fun RuntimeStatusCard(
             }
         },
         showIndication = onClick != null,
-        colors = CardDefaults.defaultColors(
-            color = COUITheme.colorScheme.surfaceVariant,
-            contentColor = COUITheme.colorScheme.onSurface,
-        ),
     ) {
         Column {
             Text(
