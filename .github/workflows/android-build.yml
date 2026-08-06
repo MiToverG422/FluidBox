@@ -63,7 +63,7 @@ jobs:
                 ;;
               release)
                 VERSION_NAME="${INPUT_VERSION:-${DEFAULT_BASE_VERSION}}"
-                BUILD_VARIANT="release"
+                BUILD_VARIANT="both"
                 ;;
               *)
                 echo "Unsupported manual channel: ${CHANNEL}"
@@ -76,7 +76,7 @@ jobs:
             if [[ "${TAG}" =~ ^v([0-9]+\.[0-9]+(\.[0-9]+)?)$ ]]; then
               CHANNEL="release"
               VERSION_NAME="${BASH_REMATCH[1]}"
-              BUILD_VARIANT="release"
+              BUILD_VARIANT="both"
             else
               echo "Unsupported tag format: ${TAG}"
               echo "Use vX.Y or vX.Y.Z"
