@@ -12,12 +12,12 @@ on:
           - ci
           - release
       version_name:
-        description: "Optional version name override"
+        description: "Optional base version name override"
         required: false
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -46,7 +46,6 @@ jobs:
 
           DEFAULT_BASE_VERSION="16.0"
           CI_CODE="${GITHUB_SHA:0:8}"
-          CI_VERSION_NAME="${DEFAULT_BASE_VERSION}-CI-${CI_CODE}"
 
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
             CHANNEL="${{ github.event.inputs.channel }}"
@@ -58,16 +57,13 @@ jobs:
 
             case "${CHANNEL}" in
               ci)
-                VERSION_NAME="${INPUT_VERSION:-${CI_VERSION_NAME}}"
-                BUILD_VARIANT="release"
-                RELEASE_TAG="ci-latest"
-                RELEASE_NAME="FluidBox CI Latest ${VERSION_NAME}"
+                CI_BASE_VERSION="${INPUT_VERSION:-${DEFAULT_BASE_VERSION}}"
+                VERSION_NAME="${CI_BASE_VERSION}-CI-${CI_CODE}"
+                BUILD_VARIANT="both"
                 ;;
               release)
                 VERSION_NAME="${INPUT_VERSION:-${DEFAULT_BASE_VERSION}}"
                 BUILD_VARIANT="release"
-                RELEASE_TAG="v${VERSION_NAME}"
-                RELEASE_NAME="FluidBox ${VERSION_NAME}"
                 ;;
               *)
                 echo "Unsupported manual channel: ${CHANNEL}"
@@ -81,8 +77,6 @@ jobs:
               CHANNEL="release"
               VERSION_NAME="${BASH_REMATCH[1]}"
               BUILD_VARIANT="release"
-              RELEASE_TAG="${TAG}"
-              RELEASE_NAME="FluidBox ${VERSION_NAME}"
             else
               echo "Unsupported tag format: ${TAG}"
               echo "Use vX.Y or vX.Y.Z"
@@ -90,10 +84,8 @@ jobs:
             fi
           else
             CHANNEL="ci"
-            VERSION_NAME="${CI_VERSION_NAME}"
-            BUILD_VARIANT="release"
-            RELEASE_TAG="ci-latest"
-            RELEASE_NAME="FluidBox CI Latest ${VERSION_NAME}"
+            VERSION_NAME="${DEFAULT_BASE_VERSION}-CI-${CI_CODE}"
+            BUILD_VARIANT="both"
           fi
 
           # Monotonic versionCode: start from 1 and increase by 1 every workflow run.
@@ -111,8 +103,6 @@ jobs:
           echo "version_code=${VERSION_CODE}" >> "${GITHUB_OUTPUT}"
           echo "ci_code=${CI_CODE}" >> "${GITHUB_OUTPUT}"
           echo "build_variant=${BUILD_VARIANT}" >> "${GITHUB_OUTPUT}"
-          echo "release_tag=${RELEASE_TAG}" >> "${GITHUB_OUTPUT}"
-          echo "release_name=${RELEASE_NAME}" >> "${GITHUB_OUTPUT}"
           echo "apk_path_glob=${APK_PATH_GLOB}" >> "${GITHUB_OUTPUT}"
 
           echo "Resolved channel=${CHANNEL}"
@@ -120,8 +110,6 @@ jobs:
           echo "Resolved version_code=${VERSION_CODE}"
           echo "Resolved ci_code=${CI_CODE}"
           echo "Resolved build_variant=${BUILD_VARIANT}"
-          echo "Resolved release_tag=${RELEASE_TAG}"
-          echo "Resolved release_name=${RELEASE_NAME}"
           echo "Resolved apk_path_glob=${APK_PATH_GLOB}"
 
       - name: Prepare signing config
@@ -232,8 +220,7 @@ jobs:
             echo "files=${RELEASE_OUT}" >> "${GITHUB_OUTPUT}"
           fi
 
-      - name: Upload APK Artifact (CI)
-        if: steps.version.outputs.channel == 'ci'
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: fluidbox-${{ steps.version.outputs.version_name }}
@@ -423,14 +410,4 @@ jobs:
               print((text or "unknown error")[:800])
 
           PY
-
-      - name: Publish APK files
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.version.outputs.release_tag }}
-          name: ${{ steps.version.outputs.release_name }}
-          prerelease: ${{ steps.version.outputs.channel == 'ci' }}
-          target_commitish: ${{ github.sha }}
-          files: ${{ steps.apks.outputs.files }}
-          overwrite_files: true
 
